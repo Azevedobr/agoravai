@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+.metadata/
+.settings/
+.project
+.classpath
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,230 @@
+.caixa-historico {
+  max-width: 900px;
+  margin: 40px auto;
+  background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2D1B69 100%);
+  padding: 30px 25px;
+  border-radius: 25px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  min-height: 100vh;
+}
+
+.conteudo-historico h2 {
+  font-size: 2.2rem;
+  margin-bottom: 25px;
+  text-align: center;
+  color: white;
+  font-weight: 700;
+}
+
+.botoes-acao {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.botao-voltar,
+.botao-verde,
+.botao-vermelho,
+.botao-azul {
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  user-select: none;
+}
+
+.botao-voltar {
+  background: #252B4A;
+  color: white;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+.botao-voltar:hover {
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+}
+
+.botao-verde {
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  color: white;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+}
+.botao-verde:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(108, 99, 255, 0.4);
+}
+
+.botao-vermelho {
+  background-color: #dc3545;
+  color: white;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+.botao-vermelho:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+.botao-azul {
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  color: white;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+}
+.botao-azul:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(108, 99, 255, 0.4);
+}
+
+.sem-pedidos {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* Lista de pedidos como cards */
+.lista-pedidos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card-pedido {
+  background: #252B4A;
+  border-radius: 20px;
+  padding: 20px 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+
+.card-pedido:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.data-pedido {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* Cores dos status */
+.status-pendente {
+  background: linear-gradient(135deg, #fd7e14, #ff9f43);
+}
+.status-aceito {
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+}
+.status-cancelado {
+  background-color: #dc3545;
+}
+.status-finalizado {
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+}
+.status-pago {
+  background: linear-gradient(135deg, #FFE44C, #f4d03f);
+  color: black;
+}
+
+.info-pedido p {
+  margin: 6px 0;
+  font-size: 1rem;
+  color: white;
+}
+
+.produtos-pedido {
+  margin: 15px 0;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 15px;
+}
+
+.produto-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  padding: 4px 0;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+}
+
+.total-pedido {
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 10px;
+  margin-top: 10px;
+  text-align: right;
+  font-size: 1.1rem;
+  color: #FFE44C;
+  font-weight: 700;
+}
+
+.motivo-cancelamento {
+  font-size: 0.9rem;
+  color: #ff6b6b;
+  background: rgba(220, 53, 69, 0.1);
+  border-left: 4px solid #dc3545;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+}
+
+.acoes-pedido {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 720px) {
+  .lista-pedidos {
+    gap: 15px;
+  }
+
+  .card-pedido {
+    padding: 15px 20px;
+  }
+
+  .header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .acoes-pedido {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}

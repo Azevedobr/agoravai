@@ -1,0 +1,140 @@
+.help-container {
+  background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2D1B69 100%);
+  min-height: 100vh;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.help-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-top: 40px;
+}
+
+.back-btn {
+  background: #252B4A;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.help-header h1 {
+  color: white;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.help-header p {
+  color: rgba(255,255,255,0.7);
+  font-size: 16px;
+}
+
+.help-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.contact-section {
+  margin-bottom: 50px;
+}
+
+.contact-section h2 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.contact-card {
+  background: #1A1F3A;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.contact-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.contact-card h3 {
+  color: white;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.contact-card p {
+  color: #6C63FF;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.contact-card span {
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+}
+
+.faq-section h2 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.faq-item {
+  background: #1A1F3A;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 15px;
+}
+
+.faq-item h4 {
+  color: white;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.faq-item p {
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .help-container {
+    padding: 15px;
+  }
+  
+  .contact-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .help-header h1 {
+    font-size: 24px;
+  }
+}

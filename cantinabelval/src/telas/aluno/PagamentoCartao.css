@@ -1,0 +1,100 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2D1B69 100%);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: white;
+  }
+   
+  /* Container para os botões de navegação */
+  .botao-container {
+    display: flex; /* Alinhamento flexível */
+    justify-content: center; /* Centraliza os botões horizontalmente */
+    margin-bottom: 20px; /* Espaço abaixo dos botões */
+  }
+   
+  /* Estilo para cada caixa de link */
+  .caixa {
+    text-align: center;
+    margin: 0 10px; /* Margem entre as caixas */
+  }
+   
+  /* Estilo do texto nas caixas */
+  .texto-inicio,
+  .texto-menu,
+  .texto-carrinho,
+  .texto-perfil {
+    color: #6C63FF;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: -190px;
+    margin-left: 110px;
+    font-weight: 500;
+  }
+   
+  /* Estilo para o link de navegação */
+  
+   
+  /* Caixa Grande */
+  .caixa-grande {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 50px;
+    margin: 0 auto;
+    max-width: 400px;
+    text-align: center;
+    background: #1A1F3A;
+    border-radius: 20px;
+    margin-top: -100px;
+    margin-left: 650px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    color: white;
+  }
+   
+  /* Estilos para textos dentro da caixa grande */
+  .texto-cheetos {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+  }
+   
+  .texto-preco {
+    font-size: 20px;
+    color: #FFE44C;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+   
+  /* Caixa da nova seção */
+  .nova-caixa {
+    background: #252B4A;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+   
+  .texto-retireseuproduto {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+  }
+   
+  /* Estilo para o botão */
+  .botao {
+    background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+  }
+   
+  .botao:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(108, 99, 255, 0.4);
+  }

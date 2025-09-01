@@ -1,0 +1,286 @@
+:root {
+  --cor-primaria: #6C63FF;
+  --cor-secundaria: #FFE44C;
+  --cor-accent: #8B7EFF;
+  --cor-fundo-escuro: #0A0E27;
+  --cor-superficie: #1A1F3A;
+  --cor-card: #252B4A;
+  --sombra: 0 8px 25px rgba(0,0,0,0.2);
+  --gradient-primary: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  --gradient-background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2D1B69 100%);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--gradient-background);
+  font-family: 'Poppins', sans-serif;
+  color: white;
+}
+
+.menu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 20px 100px;
+  position: relative;
+  min-height: 100vh;
+}
+
+.menu-titulo {
+  text-align: center;
+  margin: 4rem 0 2rem;
+  position: relative;
+}
+
+.destaque-titulo {
+  display: inline-block;
+  font-size: 2.8rem;
+  color: white;
+  position: relative;
+  padding: 0 2rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.linha-decorativa {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+/* Botões de filtro de categorias */
+.filtro-categorias {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 3rem;
+  padding: 0 10px;
+}
+
+.btn-categoria {
+  background: var(--cor-superficie);
+  border: none;
+  color: white;
+  padding: 20px 36px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-family: 'Poppins', sans-serif;
+  min-width: 140px;
+  font-size: 16px;
+}
+
+.btn-categoria:hover {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-categoria.ativo {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+}
+
+/* Grid dos produtos com quadrados menores */
+.menu-itens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.8rem;
+  padding: 0 10px;
+}
+
+.menu-item {
+  background: var(--cor-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.menu-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.imagem-container {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  background: var(--cor-superficie);
+  border-radius: 20px 20px 0 0;
+}
+
+.menu-imagem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.efeito-imagem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+}
+
+.conteudo-item {
+  padding: 1rem 1.2rem 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Badge da categoria */
+.categoria-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--cor-secundaria);
+  color: black;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 6px rgba(255, 228, 76, 0.6);
+}
+
+.menu-nome {
+  font-size: 1.25rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.detalhes-produto {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.menu-descricao {
+  color: rgba(255,255,255,0.6);
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+  flex-grow: 1;
+  font-size: 0.9rem;
+}
+
+.preco-container {
+  margin-top: auto;
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.menu-preco {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--cor-secundaria);
+  text-align: center;
+}
+
+.menu-botao {
+  position: relative;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 0.8rem;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+  font-family: 'Poppins', sans-serif;
+  min-height: 50px;
+}
+
+.efeito-botao {
+  position: absolute;
+  background: rgba(255,255,255,0.2);
+  width: 50px;
+  height: 100%;
+  left: -30%;
+  top: 0;
+  transform: skewX(-15deg);
+  transition: left 0.3s ease;
+}
+
+.menu-botao:hover .efeito-botao {
+  left: 120%;
+}
+
+.menu-botao:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(108, 99, 255, 0.4);
+}
+
+.menu-botao:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+
+
+.nenhum-produto {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 1.2rem;
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .menu-container {
+    padding: 80px 15px 20px;
+  }
+  
+  .destaque-titulo {
+    font-size: 2rem;
+  }
+  
+  .menu-itens {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    padding: 0 10px;
+  }
+  
+  .imagem-container {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .voltar-botao {
+    top: 15px;
+    left: 15px;
+    padding: 10px 20px;
+  }
+  
+  .menu-preco {
+    font-size: 1.2rem;
+  }
+}

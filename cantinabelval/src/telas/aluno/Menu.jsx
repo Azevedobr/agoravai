@@ -1,41 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Menu.css';
-import { ProdutoService, CarrinhoService, UsuarioService } from '../../services';
+import { ProdutoService, CarrinhoService, UsuarioService, CategoriaService } from '../../services';
 import BottomNavigation from '../../components/BottomNavigation';
 import AppHeader from '../../components/AppHeader';
 import SearchBar from '../../components/SearchBar';
 
-const categorias = [
-  'Todos',
-  'Sorvete',
-  'Bebida',
-  'Salgadinhos',
-  'Bolachas',
-  'Doces',
-  'Promoção'
-];
-
 const Menu = () => {
   const navigate = useNavigate();
   const [produtos, setProdutos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const carregarProdutos = async () => {
-      try {
-        const response = await ProdutoService.findAll();
-        setProdutos(response.data);
-      } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-        // Fallback para localStorage se API falhar
-        const produtosSalvos = JSON.parse(localStorage.getItem('produtos')) || [];
-        setProdutos(produtosSalvos);
-      }
-    };
-    carregarProdutos();
+    carregarDados();
   }, []);
+
+  const carregarDados = async () => {
+    try {
+      const [produtosRes, categoriasRes] = await Promise.all([
+        fetch('http://localhost:8080/produto/findAll'),
+        fetch('http://localhost:8080/categoria/findAll')
+      ]);
+      
+      const produtos = await produtosRes.json();
+      const categorias = await categoriasRes.json();
+      
+      console.log('Produtos carregados:', produtos);
+      const produtosAtivos = produtos.filter(p => p.statusProduto === 'ATIVO');
+      console.log('Produtos ativos:', produtosAtivos);
+      
+      setProdutos(produtosAtivos);
+      setCategorias([{ id: 0, nome: 'Todos' }, ...categorias]);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      // Fallback com produtos simulados
+      setProdutos([
+        { id: 1, nome: 'Muçarela', categoria: { nome: 'QUEIJO' }, preco: 29.98, codigoBarras: '0001', descricao: 'Pizza de muçarela', statusProduto: 'ATIVO' },
+        { id: 2, nome: 'Calabresa', categoria: { nome: 'CARNES & FRIOS' }, preco: 29.98, codigoBarras: '0002', descricao: 'Pizza de calabresa', statusProduto: 'ATIVO' }
+      ]);
+      setCategorias([{ id: 0, nome: 'Todos' }, { id: 1, nome: 'QUEIJO' }, { id: 2, nome: 'CARNES & FRIOS' }]);
+    }
+  };
 
   const handleAdicionar = async (produto) => {
     const usuario = UsuarioService.getCurrentUser();
@@ -66,7 +73,7 @@ const Menu = () => {
   };
 
   const produtosFiltrados = produtos.filter(produto => {
-    const matchesCategory = categoriaSelecionada === 'Todos' || produto.categoria === categoriaSelecionada;
+    const matchesCategory = categoriaSelecionada === 'Todos' || produto.categoria?.nome === categoriaSelecionada;
     const matchesSearch = produto.nome.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -89,26 +96,29 @@ const Menu = () => {
       <div className="filtro-categorias">
         {categorias.map(cat => (
           <button
-            key={cat}
-            className={`btn-categoria ${categoriaSelecionada === cat ? 'ativo' : ''}`}
-            onClick={() => setCategoriaSelecionada(cat)}
+            key={cat.id}
+            className={`btn-categoria ${categoriaSelecionada === cat.nome ? 'ativo' : ''}`}
+            onClick={() => setCategoriaSelecionada(cat.nome)}
           >
-            {cat}
+            {cat.nome}
           </button>
         ))}
       </div>
 
       <div className="menu-itens">
         {produtosFiltrados.length === 0 && (
-          <p className="nenhum-produto">Nenhum produto encontrado nesta categoria.</p>
+          <div className="nenhum-produto">
+            <p>Nenhum produto encontrado.</p>
+            <p>Total de produtos: {produtos.length}</p>
+          </div>
         )}
 
         {produtosFiltrados.map((produto) => (
           <div className="menu-item" key={produto.id}>
-            {produto.imagem && (
+            {produto.foto && (
               <div className="imagem-container">
                 <img 
-                  src={produto.imagem} 
+                  src={`data:image/jpeg;base64,${produto.foto}`}
                   alt={produto.nome} 
                   className="menu-imagem"
                   loading="lazy"
@@ -117,11 +127,10 @@ const Menu = () => {
               </div>
             )}
             <div className="conteudo-item">
-              <div className="categoria-badge">{produto.categoria}</div>
+              <div className="categoria-badge">{produto.categoria?.nome}</div>
               <h2 className="menu-nome">{produto.nome}</h2>
               <div className="detalhes-produto">
-                {produto.peso && <p className="menu-peso">⚖️ {produto.peso}</p>}
-                {produto.volume && <p className="menu-volume">📦 {produto.volume}</p>}
+                {produto.codigoBarras && <p className="menu-codigo">📊 {produto.codigoBarras}</p>}
               </div>
               <p className="menu-descricao">{produto.descricao}</p>
               <div className="preco-container">

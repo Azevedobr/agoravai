@@ -14,7 +14,7 @@ function Login() {
 
   const mostrarSenha = () => setSenhaVisivel(!senhaVisivel);
 
-  const validarFormulario = (e) => {
+  const validarFormulario = async (e) => {
     e.preventDefault();
     if (!email || !senha) {
       alert('Por favor, preencha ambos os campos!');
@@ -23,20 +23,27 @@ function Login() {
     
     setLoading(true);
     
-    // Verificar credenciais de admin
-    if (email === 'admin@admin' && senha === 'admin') {
-      setTimeout(() => {
-        setLoading(false);
-        navigate('/telainicio');
-      }, 1000);
-      return;
-    }
-    
-    // Login normal para alunos
-    setTimeout(() => {
+    try {
+      const usuario = await UsuarioService.signin(email, senha);
+      
+      if (usuario) {
+        // Login bem-sucedido
+        if (usuario.nivelAcesso === 'ADMIN') {
+          navigate('/telainicio');
+        } else {
+          navigate('/telainicial');
+        }
+      }
+    } catch (error) {
+      console.error('Erro no login:', error);
+      if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert('Email ou senha incorretos!');
+      }
+    } finally {
       setLoading(false);
-      navigate('/telainicial');
-    }, 1000);
+    }
   };
 
   const voltarParaApp = () => navigate('/');

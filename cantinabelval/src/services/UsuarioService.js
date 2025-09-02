@@ -20,7 +20,7 @@ const signup = (nome, email, password) => {
 };
 
 const signin = async (email, senha) => {
-    const response = await httpClient.post(API_ROUTES.AUTH.LOGIN_USUARIO, {
+    const response = await httpClient.post('/usuario/login', {
         email,
         senha,
     });

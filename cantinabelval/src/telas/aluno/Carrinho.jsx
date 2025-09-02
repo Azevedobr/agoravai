@@ -62,33 +62,65 @@ const Carrinho = () => {
     if (!pagamento || items.length === 0) return;
     
     const usuario = UsuarioService.getCurrentUser();
-    const nomeCliente = usuario ? usuario.nome : 'Cliente';
-  
-    const novoPedido = {
-      id: Date.now(),
-      precoTotal: total,
-      produtos: items.map((item) => ({
-        nome: item.nome,
-        quantidade: item.quantidade,
-        preco: item.preco
-      })),
-      nomeCliente,
-      formaPagamento: pagamento,
-      status: 'pendente',
-      data: new Date().toISOString()
-    };
+    if (!usuario) {
+      alert('Você precisa estar logado para fazer um pedido!');
+      navigate('/entraraluno');
+      return;
+    }
   
     try {
-      await PedidoService.create(novoPedido);
-      if (usuario) {
-        await CarrinhoService.limparCarrinho(usuario.id);
+      // Criar pedido no banco usando JSON
+      const itensTexto = items.map(item => 
+        `${item.nome} (${item.quantidade}x) - R$ ${(item.preco * item.quantidade).toFixed(2)}`
+      ).join('; ');
+      
+      const pedidoData = {
+        usuario: { id: usuario.id },
+        valor: parseFloat(total.toFixed(2)),
+        formaPagto: pagamento,
+        infoPedido: `Pedido de ${usuario.nome} - Itens: ${itensTexto}`,
+        statusPedido: 'ATIVO',
+        dataPedido: new Date().toISOString()
+      };
+      
+      console.log('Enviando pedido:', pedidoData);
+      
+      const response = await fetch('http://localhost:8080/pedido/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pedidoData)
+      });
+      
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response body:', responseText);
+      
+      if (response.ok) {
+        alert('Pedido realizado com sucesso!');
+        setItems([]);
+        navigate('/pedidos');
+      } else {
+        throw new Error(`Erro ao criar pedido: ${responseText}`);
       }
-      alert('Pedido realizado com sucesso!');
-      setItems([]);
-      navigate('/pedidos');
     } catch (error) {
       console.error('Erro ao conectar com backend:', error);
       // Fallback: salvar no localStorage
+      const novoPedido = {
+        id: Date.now(),
+        precoTotal: total,
+        produtos: items.map((item) => ({
+          nome: item.nome,
+          quantidade: item.quantidade,
+          preco: item.preco
+        })),
+        nomeCliente: usuario.nome,
+        formaPagamento: pagamento,
+        status: 'pendente',
+        data: new Date().toISOString()
+      };
+      
       const pedidosExistentes = JSON.parse(localStorage.getItem('pedidos')) || [];
       pedidosExistentes.push(novoPedido);
       localStorage.setItem('pedidos', JSON.stringify(pedidosExistentes));

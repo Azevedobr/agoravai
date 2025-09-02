@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +53,56 @@ public class PedidoController {
     @PostMapping("/create")
     public Pedido createPedido(@RequestBody Pedido pedido) {
         return pedidoRepository.save(pedido);
+    }
+
+    // PUT: /pedido/aceitar/{id}
+    @PutMapping("/aceitar/{id}")
+    public ResponseEntity<Pedido> aceitarPedido(@PathVariable Integer id) {
+        Optional<Pedido> pedidoExistente = pedidoRepository.findById(id);
+        if (pedidoExistente.isPresent()) {
+            Pedido pedido = pedidoExistente.get();
+            pedido.setStatusPedido("ACEITO");
+            // Gerar senha de 4 dígitos
+            int senha = 1000 + (int)(Math.random() * 9000);
+            String senhaStr = String.valueOf(senha);
+            pedido.setSenhaPedido(senhaStr);
+            
+            // Garantir que dataPedido existe
+            if (pedido.getDataPedido() == null) {
+                pedido.setDataPedido(java.time.LocalDateTime.now());
+            }
+            
+            Pedido pedidoSalvo = pedidoRepository.save(pedido);
+            return ResponseEntity.ok(pedidoSalvo);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // PUT: /pedido/cancelar/{id}
+    @PutMapping("/cancelar/{id}")
+    public ResponseEntity<Pedido> cancelarPedido(@PathVariable Integer id) {
+        Optional<Pedido> pedidoExistente = pedidoRepository.findById(id);
+        if (pedidoExistente.isPresent()) {
+            Pedido pedido = pedidoExistente.get();
+            pedido.setStatusPedido("CANCELADO");
+            return ResponseEntity.ok(pedidoRepository.save(pedido));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // PUT: /pedido/finalizar/{id}
+    @PutMapping("/finalizar/{id}")
+    public ResponseEntity<Pedido> finalizarPedido(@PathVariable Integer id) {
+        Optional<Pedido> pedidoExistente = pedidoRepository.findById(id);
+        if (pedidoExistente.isPresent()) {
+            Pedido pedido = pedidoExistente.get();
+            pedido.setStatusPedido("FINALIZADO");
+            return ResponseEntity.ok(pedidoRepository.save(pedido));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // DELETE: /api/pedido/{id}

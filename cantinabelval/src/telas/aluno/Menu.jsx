@@ -32,15 +32,23 @@ const Menu = () => {
       console.log('Produtos ativos:', produtosAtivos);
       
       setProdutos(produtosAtivos);
-      setCategorias([{ id: 0, nome: 'Todos' }, ...categorias]);
+      // Usar apenas as 5 categorias definidas
+      setCategorias([
+        { id: 0, nome: 'Todos' },
+        { id: 8, nome: 'BEBIDAS' },
+        { id: 2, nome: 'DOCES' },
+        { id: 1, nome: 'SALGADOS' },
+        { id: 4, nome: 'SORVETES' },
+        { id: 7, nome: 'BOLACHAS' }
+      ]);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       // Fallback com produtos simulados
       setProdutos([
-        { id: 1, nome: 'Muçarela', categoria: { nome: 'QUEIJO' }, preco: 29.98, codigoBarras: '0001', descricao: 'Pizza de muçarela', statusProduto: 'ATIVO' },
-        { id: 2, nome: 'Calabresa', categoria: { nome: 'CARNES & FRIOS' }, preco: 29.98, codigoBarras: '0002', descricao: 'Pizza de calabresa', statusProduto: 'ATIVO' }
+        { id: 1, nome: 'Coca-Cola', categoria: { nome: 'BEBIDAS' }, preco: 5.50, codigoBarras: '0001', descricao: 'Refrigerante Coca-Cola', statusProduto: 'ATIVO' },
+        { id: 2, nome: 'Brigadeiro', categoria: { nome: 'DOCES' }, preco: 3.00, codigoBarras: '0002', descricao: 'Brigadeiro gourmet', statusProduto: 'ATIVO' }
       ]);
-      setCategorias([{ id: 0, nome: 'Todos' }, { id: 1, nome: 'QUEIJO' }, { id: 2, nome: 'CARNES & FRIOS' }]);
+      setCategorias([{ id: 0, nome: 'Todos' }, { id: 8, nome: 'BEBIDAS' }, { id: 2, nome: 'DOCES' }, { id: 1, nome: 'SALGADOS' }, { id: 4, nome: 'SORVETES' }, { id: 7, nome: 'BOLACHAS' }]);
     }
   };
 
@@ -73,7 +81,14 @@ const Menu = () => {
   };
 
   const produtosFiltrados = produtos.filter(produto => {
-    const matchesCategory = categoriaSelecionada === 'Todos' || produto.categoria?.nome === categoriaSelecionada;
+    // Mapear categorias do banco para nossas categorias
+    let categoriaNome = produto.categoria?.nome;
+    if (produto.categoria?.id === 4) categoriaNome = 'SORVETES';
+    if (produto.categoria?.id === 1) categoriaNome = 'SALGADOS';
+    if (produto.categoria?.id === 7) categoriaNome = 'BOLACHAS';
+    if (produto.categoria?.id === 8) categoriaNome = 'BEBIDAS';
+    
+    const matchesCategory = categoriaSelecionada === 'Todos' || categoriaNome === categoriaSelecionada;
     const matchesSearch = produto.nome.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -127,7 +142,13 @@ const Menu = () => {
               </div>
             )}
             <div className="conteudo-item">
-              <div className="categoria-badge">{produto.categoria?.nome}</div>
+              <div className="categoria-badge">
+                {produto.categoria?.id === 4 ? 'SORVETES' :
+                 produto.categoria?.id === 1 ? 'SALGADOS' :
+                 produto.categoria?.id === 7 ? 'BOLACHAS' :
+                 produto.categoria?.id === 8 ? 'BEBIDAS' :
+                 produto.categoria?.nome}
+              </div>
               <h2 className="menu-nome">{produto.nome}</h2>
               <div className="detalhes-produto">
                 {produto.codigoBarras && <p className="menu-codigo">📊 {produto.codigoBarras}</p>}

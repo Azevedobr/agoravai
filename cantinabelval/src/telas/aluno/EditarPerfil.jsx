@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faCamera, faUser, faEnvelope, faLock, faPhone } from '@fortawesome/free-solid-svg-icons';
 import './EditarPerfil.css';
 import { useNavigate } from 'react-router-dom';
+import { UsuarioService } from '../../services';
 import AppHeader from '../../components/AppHeader';
 import BottomNavigation from '../../components/BottomNavigation';
 
@@ -11,11 +12,37 @@ function EditarPerfil() {
   const [confirmaSenhaVisivel, setConfirmaSenhaVisivel] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
-    nome: 'João Silva',
-    email: 'joao@exemplo.com',
-    telefone: '(11) 99999-8888',
-    foto: 'https://via.placeholder.com/150/6C63FF/FFFFFF?text=JS'
+    nome: '',
+    email: '',
+    telefone: '',
+    foto: 'https://via.placeholder.com/150/6C63FF/FFFFFF?text=U'
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    carregarDadosUsuario();
+  }, []);
+
+  const carregarDadosUsuario = () => {
+    try {
+      const usuario = UsuarioService.getCurrentUser();
+      if (usuario) {
+        setUserData({
+          nome: usuario.nome || '',
+          email: usuario.email || '',
+          telefone: usuario.telefone || '',
+          foto: usuario.foto ? `data:image/jpeg;base64,${usuario.foto}` : 'https://via.placeholder.com/150/6C63FF/FFFFFF?text=' + (usuario.nome ? usuario.nome.charAt(0) : 'U')
+        });
+      } else {
+        // Se não há usuário logado, redirecionar para login
+        navigate('/entraraluno');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do usuário:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const [senha, setSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
   const navigate = useNavigate();
@@ -31,14 +58,64 @@ function EditarPerfil() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (senha && senha !== confirmaSenha) {
       alert('As senhas não coincidem!');
       return;
     }
-    alert('Perfil atualizado com sucesso!');
-    navigate('/telainicial');
+    
+    try {
+      const usuario = UsuarioService.getCurrentUser();
+      if (usuario) {
+        // Atualizar nome via API
+        const formData = new FormData();
+        formData.append('nome', userData.nome);
+        formData.append('nivelAcesso', usuario.nivelAcesso || 'USER');
+        
+        const response = await fetch(`http://localhost:8080/usuario/editar/${usuario.id}`, {
+          method: 'PUT',
+          body: formData
+        });
+        
+        if (response.ok) {
+          // Se há nova senha, atualizar senha
+          if (senha) {
+            const senhaData = new FormData();
+            senhaData.append('senha', senha);
+            
+            const senhaResponse = await fetch(`http://localhost:8080/usuario/alterarSenha/${usuario.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ senha: senha })
+            });
+            
+            if (!senhaResponse.ok) {
+              throw new Error('Erro ao atualizar senha');
+            }
+          }
+          
+          // Atualizar dados no localStorage
+          const usuarioAtualizado = {
+            ...usuario,
+            nome: userData.nome
+          };
+          localStorage.setItem('user', JSON.stringify(usuarioAtualizado));
+          
+          alert('Perfil atualizado com sucesso!');
+          setIsEditing(false);
+          setSenha('');
+          setConfirmaSenha('');
+        } else {
+          throw new Error('Erro ao atualizar perfil');
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      alert('Erro ao atualizar perfil!');
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -52,7 +129,14 @@ function EditarPerfil() {
     <>
       <AppHeader title="Editar Perfil" subtitle="Atualize suas informações" showBack={true} showCart={false} />
       
-      <div className="profile-edit-container">
+      {loading ? (
+        <div className="profile-edit-container">
+          <div className="loading-state">
+            <p>Carregando dados do perfil...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="profile-edit-container">
         <div className="profile-content">
           {/* Seção da foto de perfil */}
           <div className="profile-photo-section">
@@ -204,6 +288,7 @@ function EditarPerfil() {
           </form>
         </div>
       </div>
+      )}
       
       <BottomNavigation />
     </>

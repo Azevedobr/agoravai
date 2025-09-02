@@ -6,11 +6,11 @@ const CadastrarProduto = () => {
   const navigate = useNavigate();
   const [produtos, setProdutos] = useState([]);
   const [categorias, setCategorias] = useState([
-    { id: 1, nome: 'CARNES & FRIOS' },
+    { id: 8, nome: 'BEBIDAS' },
     { id: 2, nome: 'DOCES' },
-    { id: 3, nome: 'BEBIDAS' },
-    { id: 4, nome: 'FRANGO' },
-    { id: 7, nome: 'QUEIJO' }
+    { id: 1, nome: 'SALGADOS' },
+    { id: 4, nome: 'SORVETES' },
+    { id: 7, nome: 'BOLACHAS' }
   ]);
   const [novoProduto, setNovoProduto] = useState({
     nome: '',
@@ -29,6 +29,7 @@ const CadastrarProduto = () => {
       const response = await fetch('http://localhost:8080/produto/findAll');
       const data = await response.json();
       console.log('Produtos do banco:', data);
+      // Mostrar todos os produtos (ativos e inativos)
       setProdutos(data || []);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
@@ -77,19 +78,36 @@ const CadastrarProduto = () => {
     }
   };
 
-  const handleExcluir = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este produto?')) {
+  const handleInativar = async (id) => {
+    if (window.confirm('Tem certeza que deseja inativar este produto?')) {
       try {
         const response = await fetch(`http://localhost:8080/produto/inativar/${id}`, {
           method: 'PUT'
         });
         if (response.ok) {
-          alert('Produto excluído com sucesso!');
+          alert('Produto inativado com sucesso!');
           carregarProdutos();
         }
       } catch (error) {
-        console.error('Erro ao excluir produto:', error);
-        alert('Erro ao excluir produto!');
+        console.error('Erro ao inativar produto:', error);
+        alert('Erro ao inativar produto!');
+      }
+    }
+  };
+
+  const handleReativar = async (id) => {
+    if (window.confirm('Tem certeza que deseja reativar este produto?')) {
+      try {
+        const response = await fetch(`http://localhost:8080/produto/reativar/${id}`, {
+          method: 'PUT'
+        });
+        if (response.ok) {
+          alert('Produto reativado com sucesso!');
+          carregarProdutos();
+        }
+      } catch (error) {
+        console.error('Erro ao reativar produto:', error);
+        alert('Erro ao reativar produto!');
       }
     }
   };
@@ -202,20 +220,39 @@ const CadastrarProduto = () => {
                   
                   <div className="product-details">
                     <h4>{produto.nome}</h4>
-                    <p className="category">{produto.categoria?.nome}</p>
+                    <p className="category">
+                      {produto.categoria?.id === 4 ? 'SORVETES' :
+                       produto.categoria?.id === 1 ? 'SALGADOS' :
+                       produto.categoria?.id === 7 ? 'BOLACHAS' :
+                       produto.categoria?.id === 8 ? 'BEBIDAS' :
+                       produto.categoria?.nome}
+                    </p>
                     <div className="product-meta">
                       <span>{produto.codigoBarras}</span>
                       <span className="price">R$ {Number(produto.preco).toFixed(2)}</span>
+                      <span className={`status ${produto.statusProduto === 'ATIVO' ? 'ativo' : 'inativo'}`}>
+                        {produto.statusProduto === 'ATIVO' ? '✓ Ativo' : '❌ Inativo'}
+                      </span>
                     </div>
                   </div>
                   
-                  <button 
-                    className="delete-btn"
-                    onClick={() => handleExcluir(produto.id)}
-                    title="Excluir produto"
-                  >
-                    🗑️
-                  </button>
+                  {produto.statusProduto === 'ATIVO' ? (
+                    <button 
+                      className="delete-btn"
+                      onClick={() => handleInativar(produto.id)}
+                      title="Inativar produto"
+                    >
+                      🚫
+                    </button>
+                  ) : (
+                    <button 
+                      className="reactivate-btn"
+                      onClick={() => handleReativar(produto.id)}
+                      title="Reativar produto"
+                    >
+                      ✅
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

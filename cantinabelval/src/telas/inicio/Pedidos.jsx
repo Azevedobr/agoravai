@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UsuarioService } from '../../services';
 import './Pedidos.css';
 
 const Pedidos = () => {
@@ -7,10 +8,35 @@ const Pedidos = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Carrega pedidos do localStorage
-    const dados = JSON.parse(localStorage.getItem('pedidos')) || [];
-    setPedidos([...dados].reverse());
+    carregarPedidos();
   }, []);
+
+  const carregarPedidos = async () => {
+    try {
+      const usuario = UsuarioService.getCurrentUser();
+      if (!usuario) {
+        navigate('/entraraluno');
+        return;
+      }
+
+      const response = await fetch('http://localhost:8080/pedido/findAll');
+      const pedidosData = await response.json();
+      console.log('Todos os pedidos:', pedidosData);
+      
+      // Filtrar apenas pedidos do usuário logado
+      const pedidosDoUsuario = pedidosData.filter(pedido => 
+        pedido.usuario && pedido.usuario.id === usuario.id
+      );
+      console.log('Pedidos do usuário:', pedidosDoUsuario);
+      
+      setPedidos(pedidosDoUsuario.reverse());
+    } catch (error) {
+      console.error('Erro ao carregar pedidos:', error);
+      // Fallback para localStorage
+      const dados = JSON.parse(localStorage.getItem('pedidos')) || [];
+      setPedidos([...dados].reverse());
+    }
+  };
 
   const handleVoltar = () => {
     if (window.history.length > 2) {
@@ -38,50 +64,49 @@ const Pedidos = () => {
       ) : (
         <div className="lista-pedidos">
           {pedidos.map((pedido, index) => {
-            const dataFormatada = pedido.data
-              ? new Date(pedido.data).toLocaleDateString()
-              : pedido.dataPedido
+            const dataFormatada = pedido.dataPedido
               ? new Date(pedido.dataPedido).toLocaleDateString()
               : 'Data não disponível';
-            const total = pedido.precoTotal || 
-              (pedido.produtos
-                ? pedido.produtos.reduce((acc, produto) => acc + produto.preco * produto.quantidade, 0)
-                : 0);
+            const total = pedido.valor || 0;
 
             return (
               <div className="pedido-card" key={pedido.numero || index}>
                 <div className="pedido-header-card">
                   <div className="pedido-info-header">
-                    <h2>Pedido #{(pedido.numero || Date.now()).toString().slice(-6)}</h2>
+                    <h2>Pedido #{pedido.id}</h2>
                     <span className="data-pedido">{dataFormatada}</span>
                   </div>
-                  <div className={`status-badge ${pedido.status || 'pendente'}`}>
-                    {pedido.status || 'Em análise'}
+                  <div className={`status-badge ${pedido.statusPedido?.toLowerCase() || 'ativo'}`}>
+                    {pedido.statusPedido || 'ATIVO'}
                   </div>
                 </div>
 
                 <div className="pedido-info">
                   <div className="info-row">
                     <span className="label">Cliente:</span>
-                    <span>{pedido.nomeCliente || 'Cliente'}</span>
+                    <span>{pedido.usuario?.nome || 'Cliente'}</span>
                   </div>
                   <div className="info-row">
                     <span className="label">Pagamento:</span>
-                    <span>{pedido.formaPagamento || 'Não informado'}</span>
+                    <span>{pedido.formaPagto || 'Não informado'}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">Informações:</span>
+                    <span>{pedido.infoPedido || 'Sem informações'}</span>
                   </div>
                   
-                  {pedido.status === 'cancelado' && pedido.motivoCancelamento && (
+                  {pedido.statusPedido === 'CANCELADO' && (
                     <div className="info-row">
-                      <span className="label">Motivo:</span>
-                      <span>{pedido.motivoCancelamento}</span>
+                      <span className="label">Status:</span>
+                      <span>Pedido cancelado</span>
                     </div>
                   )}
                   
-                  {pedido.status === 'aceito' && (
+                  {pedido.statusPedido === 'ACEITO' && pedido.senhaPedido && (
                     <>
                       <div className="info-row">
                         <span className="label">Nº Pedido:</span>
-                        <span>{pedido.numeroPedido}</span>
+                        <span>{pedido.id}</span>
                       </div>
                       <div className="info-row">
                         <span className="label">Senha:</span>

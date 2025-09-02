@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,6 +78,20 @@ public class UsuarioController {
 		
 		return ResponseEntity.ok()
 				.body(new MessageResponse("Conta de Usuário criada com sucesso!"));
+	}
+	
+	@PostMapping("/signup")
+	public ResponseEntity<?> signup(@RequestBody Usuario usuario) {
+		
+		Usuario _usuario = usuarioService.save(usuario);
+		
+		if (_usuario != null) {
+			return ResponseEntity.ok()
+					.body(new MessageResponse("Conta criada com sucesso!"));
+		} else {
+			return ResponseEntity.badRequest()
+					.body(new MessageResponse("Email já cadastrado!"));
+		}
 	}
 	
 	@PutMapping("/editar/{id}")

@@ -30,32 +30,22 @@ function CadastroAluno() {
     }
 
     try {
-      // Simula cadastro local até backend estar funcionando
-      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-      
-      // Verifica se email já existe
-      if (usuarios.find(u => u.email === email)) {
-        alert('Email já cadastrado!');
-        return;
-      }
-      
-      // Adiciona novo usuário
-      const novoUsuario = {
-        id: Date.now(),
+      const userData = {
         nome,
         email,
-        senha,
-        tipo: 'aluno'
+        senha
       };
       
-      usuarios.push(novoUsuario);
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-      
+      await UsuarioService.cadastrarAluno(userData);
       alert('Conta criada com sucesso!');
       navigate('/entraraluno');
     } catch (error) {
       console.error('Erro no cadastro:', error);
-      alert('Erro ao criar conta. Tente novamente.');
+      if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert('Erro ao criar conta. Tente novamente.');
+      }
     }
   };
 

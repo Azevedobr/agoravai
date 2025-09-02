@@ -79,10 +79,10 @@ const updateProfile = (id, data) => {
 };
 
 const cadastrarAluno = (data) => {
-    return httpClient.post(API_ROUTES.USUARIO.SIGNUP, {
+    return httpClient.post('/usuario/signup', {
         nome: data.nome,
         email: data.email,
-        password: data.senha
+        senha: data.senha
     });
 };
 

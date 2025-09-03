@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { UsuarioService } from '../../services';
 import {
   FiClock,
   FiShoppingCart,
@@ -16,7 +17,15 @@ import './TelaInicial.css';
 
 const TelaInicial = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [userName] = useState('João');
+  const [userName, setUserName] = useState('Usuário');
+  
+  useEffect(() => {
+    const usuario = UsuarioService.getCurrentUser();
+    if (usuario && usuario.nome) {
+      const primeiroNome = usuario.nome.split(' ')[0];
+      setUserName(primeiroNome);
+    }
+  }, []);
   
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);

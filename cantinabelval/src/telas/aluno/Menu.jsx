@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Menu.css';
 import { ProdutoService, CarrinhoService, UsuarioService, CategoriaService } from '../../services';
-import BottomNavigation from '../../components/BottomNavigation';
+
 import AppHeader from '../../components/AppHeader';
 import SearchBar from '../../components/SearchBar';
 
@@ -12,9 +12,21 @@ const Menu = () => {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedItems, setExpandedItems] = useState({});
 
   useEffect(() => {
     carregarDados();
+    
+    // Escutar eventos de atualização de produtos
+    const handleProdutoAtualizado = () => {
+      carregarDados();
+    };
+    
+    window.addEventListener('produtoAtualizado', handleProdutoAtualizado);
+    
+    return () => {
+      window.removeEventListener('produtoAtualizado', handleProdutoAtualizado);
+    };
   }, []);
 
   const carregarDados = async () => {
@@ -78,6 +90,18 @@ const Menu = () => {
     }
     
     navigate('/carrinho', { state: { novoItem: produtoFormatado } });
+  };
+
+  const toggleExpanded = (produtoId) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [produtoId]: !prev[produtoId]
+    }));
+  };
+
+  const truncateText = (text, maxLength = 80) => {
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
   };
 
   const produtosFiltrados = produtos.filter(produto => {
@@ -153,7 +177,22 @@ const Menu = () => {
               <div className="detalhes-produto">
                 {produto.codigoBarras && <p className="menu-codigo">📊 {produto.codigoBarras}</p>}
               </div>
-              <p className="menu-descricao">{produto.descricao}</p>
+              <div className="menu-descricao">
+                <p>
+                  {expandedItems[produto.id] 
+                    ? produto.descricao 
+                    : truncateText(produto.descricao)
+                  }
+                </p>
+                {produto.descricao && produto.descricao.length > 80 && (
+                  <button 
+                    className="btn-ler-mais"
+                    onClick={() => toggleExpanded(produto.id)}
+                  >
+                    {expandedItems[produto.id] ? 'Ler menos' : 'Ler mais'}
+                  </button>
+                )}
+              </div>
               <div className="preco-container">
                 <p className="menu-preco">
                   {Number(produto.preco).toLocaleString('pt-BR', {
@@ -174,7 +213,7 @@ const Menu = () => {
         ))}
       </div>
     </div>
-    <BottomNavigation />
+
     </>
   );
 };

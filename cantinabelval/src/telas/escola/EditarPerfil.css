@@ -426,3 +426,51 @@
     margin-bottom: 30px;
   }
 }
+/* Seção de informações da escola (sem foto) */
+.profile-info-section {
+  text-align: center;
+  padding: 40px 40px 30px;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 140, 66, 0.05));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.school-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.profile-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 8px 0;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+.edit-btn {
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  color: white;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(108, 99, 255, 0.4);
+}

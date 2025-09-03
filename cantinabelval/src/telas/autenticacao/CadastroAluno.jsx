@@ -129,7 +129,7 @@ function CadastroAluno() {
             <label className="food-check">
               <input type="checkbox" required />
               <span className="checkmark"></span>
-              Aceito os Termos de Serviço
+              Aceito os <Link to="/termos" className="food-link">Termos de Serviço</Link>
             </label>
           </div>
 

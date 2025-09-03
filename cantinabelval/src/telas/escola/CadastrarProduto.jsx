@@ -18,6 +18,8 @@ const CadastrarProduto = () => {
     preco: '',
     categoria: ''
   });
+  const [produtoEditando, setProdutoEditando] = useState(null);
+  const [modalAberto, setModalAberto] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -110,6 +112,64 @@ const CadastrarProduto = () => {
         alert('Erro ao reativar produto!');
       }
     }
+  };
+
+  const handleEditar = (produto) => {
+    setProdutoEditando({
+      id: produto.id,
+      nome: produto.nome,
+      descricao: produto.descricao || '',
+      preco: produto.preco.toString(),
+      categoria: produto.categoria?.id?.toString() || ''
+    });
+    setModalAberto(true);
+  };
+
+  const handleSalvarEdicao = async (e) => {
+    e.preventDefault();
+    if (!produtoEditando.nome || !produtoEditando.preco || !produtoEditando.categoria) {
+      alert('Preencha todos os campos obrigatórios!');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('nome', produtoEditando.nome);
+      formData.append('descricao', produtoEditando.descricao);
+      formData.append('preco', parseFloat(produtoEditando.preco));
+      formData.append('categoria', parseInt(produtoEditando.categoria));
+
+      // Usar o endpoint de alteração padrão
+      const response = await fetch(`http://localhost:8080/produto/alterar/${produtoEditando.id}`, {
+        method: 'PUT',
+        body: formData
+      });
+
+      if (response.ok) {
+        alert('Produto atualizado com sucesso!');
+        setModalAberto(false);
+        setProdutoEditando(null);
+        carregarProdutos();
+        
+        // Notificar outras telas sobre a atualização
+        window.dispatchEvent(new CustomEvent('produtoAtualizado', {
+          detail: { produtoId: produtoEditando.id }
+        }));
+      } else {
+        alert('Erro ao atualizar produto!');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar produto:', error);
+      alert('Erro ao atualizar produto!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChangeEdicao = (e) => {
+    const { name, value } = e.target;
+    setProdutoEditando({ ...produtoEditando, [name]: value });
   };
 
   return (
@@ -236,29 +296,127 @@ const CadastrarProduto = () => {
                     </div>
                   </div>
                   
-                  {produto.statusProduto === 'ATIVO' ? (
+                  <div className="product-actions">
                     <button 
-                      className="delete-btn"
-                      onClick={() => handleInativar(produto.id)}
-                      title="Inativar produto"
+                      className="edit-btn"
+                      onClick={() => handleEditar(produto)}
+                      title="Editar produto"
                     >
-                      🚫
+                      ✏️
                     </button>
-                  ) : (
-                    <button 
-                      className="reactivate-btn"
-                      onClick={() => handleReativar(produto.id)}
-                      title="Reativar produto"
-                    >
-                      ✅
-                    </button>
-                  )}
+                    {produto.statusProduto === 'ATIVO' ? (
+                      <button 
+                        className="delete-btn"
+                        onClick={() => handleInativar(produto.id)}
+                        title="Inativar produto"
+                      >
+                        🚫
+                      </button>
+                    ) : (
+                      <button 
+                        className="reactivate-btn"
+                        onClick={() => handleReativar(produto.id)}
+                        title="Reativar produto"
+                      >
+                        ✅
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {modalAberto && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Editar Produto</h3>
+              <button 
+                className="close-btn"
+                onClick={() => {
+                  setModalAberto(false);
+                  setProdutoEditando(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleSalvarEdicao} className="product-form">
+              <div className="input-field">
+                <label>Nome do Produto</label>
+                <input
+                  type="text"
+                  name="nome"
+                  value={produtoEditando?.nome || ''}
+                  onChange={handleInputChangeEdicao}
+                  placeholder="Digite o nome do produto"
+                  required
+                />
+              </div>
+              
+              <div className="input-field">
+                <label>Categoria</label>
+                <select
+                  name="categoria"
+                  value={produtoEditando?.categoria || ''}
+                  onChange={handleInputChangeEdicao}
+                  required
+                >
+                  <option value="">Selecionar</option>
+                  {categorias.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-field">
+                <label>Descrição</label>
+                <textarea
+                  name="descricao"
+                  value={produtoEditando?.descricao || ''}
+                  onChange={handleInputChangeEdicao}
+                  placeholder="Descreva o produto"
+                  rows="3"
+                />
+              </div>
+              
+              <div className="input-field">
+                <label>Preço (R$)</label>
+                <input
+                  type="number"
+                  name="preco"
+                  value={produtoEditando?.preco || ''}
+                  onChange={handleInputChangeEdicao}
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  type="button" 
+                  className="cancel-btn"
+                  onClick={() => {
+                    setModalAberto(false);
+                    setProdutoEditando(null);
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

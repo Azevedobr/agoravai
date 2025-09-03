@@ -8,34 +8,55 @@ function Editarperfil() {
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [confirmaSenhaVisivel, setConfirmaSenhaVisivel] = useState(false);
   const [userData, setUserData] = useState({
-    nome: 'Escola Exemplo',
-    email: 'escola@exemplo.com',
-    telefone: '(11) 99999-9999',
-    endereco: 'Rua das Flores, 123',
-    cnpj: '12.345.678/0001-90',
-    foto: 'https://via.placeholder.com/150/FF6B35/FFFFFF?text=🏫'
+    nome: 'ITB Brasílio Flores de Azevedo (FIEB)',
+    email: 'itb@brasilioflores.edu.br',
+    telefone: '(11) 4199-4220',
+    endereco: 'R. Interna Grupo Bandeirante, 138 - Jardim Belval, Barueri - SP, 06420-150',
+    cnpj: '12.345.678/0001-90'
   });
+  const [senhaAtual, setSenhaAtual] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
+  const [senhaAtualVisivel, setSenhaAtualVisivel] = useState(false);
+  const [modoEdicao, setModoEdicao] = useState(false);
   const navigate = useNavigate();
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserData({ ...userData, foto: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (senha && senha !== confirmaSenha) {
-      alert('As senhas não coincidem!');
-      return;
+    
+    if (senha) {
+      if (!senhaAtual) {
+        alert('Digite a senha atual para alterá-la!');
+        return;
+      }
+      if (senha !== confirmaSenha) {
+        alert('As senhas não coincidem!');
+        return;
+      }
+      
+      // Verificar senha atual no banco
+      try {
+        const response = await fetch('http://localhost:8080/usuario/verificarSenha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: userData.email, 
+            senhaAtual: senhaAtual 
+          })
+        });
+        
+        if (!response.ok) {
+          alert('Senha atual incorreta!');
+          return;
+        }
+      } catch (error) {
+        alert('Erro ao verificar senha!');
+        return;
+      }
     }
+    
     alert('Perfil atualizado com sucesso!');
     navigate('/telainicio');
   };
@@ -60,22 +81,9 @@ function Editarperfil() {
       </div>
 
       <div className="profile-content">
-        {/* Seção da foto de perfil */}
-        <div className="profile-photo-section">
-          <div className="photo-container">
-            <img src={userData.foto} alt="Perfil" className="profile-photo" />
-            <div className="photo-overlay">
-              <label className="camera-icon">
-                <FontAwesomeIcon icon={faCamera} />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                />
-              </label>
-            </div>
-          </div>
+        {/* Seção do perfil */}
+        <div className="profile-info-section">
+          <div className="school-icon">🏫</div>
           <h2 className="profile-name">{userData.nome}</h2>
           <p className="profile-email">{userData.email}</p>
         </div>
@@ -85,21 +93,21 @@ function Editarperfil() {
           <div className="form-section">
             <h3 className="section-title">
               <FontAwesomeIcon icon={faBuilding} />
-              Informações da Escola
+              Informações da Instituição
             </h3>
             
             <div className="form-group">
               <label>Nome da Instituição</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper disabled">
                 <FontAwesomeIcon icon={faBuilding} className="input-icon" />
                 <input
                   type="text"
                   value={userData.nome}
-                  onChange={(e) => setUserData({ ...userData, nome: e.target.value })}
-                  placeholder="Digite o nome da instituição"
-                  required
+                  placeholder="Nome da instituição"
+                  disabled
                 />
               </div>
+              <span className="input-help">O nome da instituição não pode ser alterado</span>
             </div>
 
             <div className="form-group">
@@ -118,30 +126,30 @@ function Editarperfil() {
 
             <div className="form-group">
               <label>Telefone</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper disabled">
                 <FontAwesomeIcon icon={faPhone} className="input-icon" />
                 <input
                   type="tel"
                   value={userData.telefone}
-                  onChange={(e) => setUserData({ ...userData, telefone: e.target.value })}
-                  placeholder="(11) 99999-9999"
-                  required
+                  placeholder="Telefone da instituição"
+                  disabled
                 />
               </div>
+              <span className="input-help">O telefone não pode ser alterado</span>
             </div>
 
             <div className="form-group">
               <label>Endereço</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper disabled">
                 <FontAwesomeIcon icon={faMapMarkerAlt} className="input-icon" />
                 <input
                   type="text"
                   value={userData.endereco}
-                  onChange={(e) => setUserData({ ...userData, endereco: e.target.value })}
-                  placeholder="Endereço completo"
-                  required
+                  placeholder="Endereço da instituição"
+                  disabled
                 />
               </div>
+              <span className="input-help">O endereço não pode ser alterado</span>
             </div>
 
             <div className="form-group">
@@ -165,42 +173,65 @@ function Editarperfil() {
               Segurança
             </h3>
 
-            <div className="form-group">
-              <label>Nova Senha</label>
-              <div className="input-wrapper">
-                <FontAwesomeIcon icon={faLock} className="input-icon" />
-                <input
-                  type={senhaVisivel ? 'text' : 'password'}
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  placeholder="Digite uma nova senha"
-                />
-                <FontAwesomeIcon
-                  icon={senhaVisivel ? faEyeSlash : faEye}
-                  className="password-toggle"
-                  onClick={() => setSenhaVisivel(!senhaVisivel)}
-                />
-              </div>
-              <span className="input-help">Deixe em branco para manter a senha atual</span>
-            </div>
+            {modoEdicao && (
+              <>
+                <div className="form-group">
+                  <label>Senha Atual</label>
+                  <div className="input-wrapper">
+                    <FontAwesomeIcon icon={faLock} className="input-icon" />
+                    <input
+                      type={senhaAtualVisivel ? 'text' : 'password'}
+                      value={senhaAtual}
+                      onChange={(e) => setSenhaAtual(e.target.value)}
+                      placeholder="Digite sua senha atual"
+                    />
+                    <FontAwesomeIcon
+                      icon={senhaAtualVisivel ? faEyeSlash : faEye}
+                      className="password-toggle"
+                      onClick={() => setSenhaAtualVisivel(!senhaAtualVisivel)}
+                    />
+                  </div>
+                  <span className="input-help">Necessário para alterar a senha</span>
+                </div>
 
-            <div className="form-group">
-              <label>Confirmar Nova Senha</label>
-              <div className="input-wrapper">
-                <FontAwesomeIcon icon={faLock} className="input-icon" />
-                <input
-                  type={confirmaSenhaVisivel ? 'text' : 'password'}
-                  value={confirmaSenha}
-                  onChange={(e) => setConfirmaSenha(e.target.value)}
-                  placeholder="Confirme a nova senha"
-                />
-                <FontAwesomeIcon
-                  icon={confirmaSenhaVisivel ? faEyeSlash : faEye}
-                  className="password-toggle"
-                  onClick={() => setConfirmaSenhaVisivel(!confirmaSenhaVisivel)}
-                />
-              </div>
-            </div>
+                <div className="form-group">
+                  <label>Nova Senha</label>
+                  <div className="input-wrapper">
+                    <FontAwesomeIcon icon={faLock} className="input-icon" />
+                    <input
+                      type={senhaVisivel ? 'text' : 'password'}
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      placeholder="Digite uma nova senha"
+                    />
+                    <FontAwesomeIcon
+                      icon={senhaVisivel ? faEyeSlash : faEye}
+                      className="password-toggle"
+                      onClick={() => setSenhaVisivel(!senhaVisivel)}
+                    />
+                  </div>
+                  <span className="input-help">Deixe em branco para manter a senha atual</span>
+                </div>
+
+                <div className="form-group">
+                  <label>Confirmar Nova Senha</label>
+                  <div className="input-wrapper">
+                    <FontAwesomeIcon icon={faLock} className="input-icon" />
+                    <input
+                      type={confirmaSenhaVisivel ? 'text' : 'password'}
+                      value={confirmaSenha}
+                      onChange={(e) => setConfirmaSenha(e.target.value)}
+                      placeholder="Confirme a nova senha"
+                    />
+                    <FontAwesomeIcon
+                      icon={confirmaSenhaVisivel ? faEyeSlash : faEye}
+                      className="password-toggle"
+                      onClick={() => setConfirmaSenhaVisivel(!confirmaSenhaVisivel)}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Ações */}
@@ -209,12 +240,25 @@ function Editarperfil() {
               🗑️ Excluir Conta
             </button>
             <div className="action-buttons">
-              <button type="button" className="cancel-btn" onClick={() => navigate(-1)}>
-                Cancelar
-              </button>
-              <button type="submit" className="save-btn">
-                💾 Salvar Alterações
-              </button>
+              {!modoEdicao ? (
+                <button type="button" className="edit-btn" onClick={() => setModoEdicao(true)}>
+                  ✏️ Editar
+                </button>
+              ) : (
+                <>
+                  <button type="button" className="cancel-btn" onClick={() => {
+                    setModoEdicao(false);
+                    setSenhaAtual('');
+                    setSenha('');
+                    setConfirmaSenha('');
+                  }}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="save-btn">
+                    💾 Salvar Alterações
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </form>

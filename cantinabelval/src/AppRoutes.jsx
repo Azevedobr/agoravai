@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import App from "./App";
 import { CadastroAluno, Login, EsqueceuSenha } from "./telas/autenticacao";
+import Termos from "./telas/autenticacao/Termos";
 import { TelaInicial, Dashboard, PaginaInicial, Pedidos } from "./telas/inicio";
 import { Carrinho, EditarPerfil as EditarPerfilAluno, PagamentoCartao, Menu } from "./telas/aluno";
 import { Funcionarios, Historico, CadastrarProduto, EditarPerfil as EditarPerfilEscola } from "./telas/escola";
@@ -29,6 +30,7 @@ const AppRoutes = () => {
       <Route path="/cadastrar-produto" element={<CadastrarProduto />} />
       <Route path="/editarperfil" element={<EditarPerfilEscola />} />
       <Route path="/central-ajuda" element={<CentralAjuda />} />
+      <Route path="/termos" element={<Termos />} />
 
 
     </Routes>

@@ -284,3 +284,70 @@ body {
     font-size: 1.2rem;
   }
 }
+/* Estilos para o botão "Ler mais" */
+.menu-descricao {
+  color: rgba(255,255,255,0.6);
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+  flex-grow: 1;
+  font-size: 0.9rem;
+  min-height: 60px; /* Altura mínima fixa para uniformizar */
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-descricao p {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.btn-ler-mais {
+  background: none;
+  border: none;
+  color: var(--cor-secundaria);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 8px;
+  text-decoration: underline;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.btn-ler-mais:hover {
+  color: white;
+  transform: translateX(2px);
+}
+
+/* Garantir altura uniforme dos cards */
+.menu-item {
+  background: var(--cor-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 380px; /* Altura mínima fixa */
+  position: relative;
+}
+
+.conteudo-item {
+  padding: 1rem 1.2rem 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  justify-content: space-between; /* Distribui o conteúdo uniformemente */
+}
+
+.menu-nome {
+  font-size: 1.25rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  min-height: 32px; /* Altura mínima para o título */
+}

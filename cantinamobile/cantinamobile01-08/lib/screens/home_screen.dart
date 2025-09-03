@@ -52,13 +52,60 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  final List<String> _categories = [
-    'Todos',
-    'Salgadinho',
-    'Bebidas',
-    'Doces',
-    'Sorvetes'
-  ];
+  List<String> _categories = ['Todos'];
+  
+  // Mapeamento de categorias para nomes mais amigáveis
+  String _mapCategoryName(String originalName) {
+    final mapping = {
+      'salgadinho': 'Salgadinhos',
+      'salgadinhos': 'Salgadinhos',
+      'carne e frios': 'Salgados',
+      'carnes & frios': 'Salgados',
+      'carne': 'Salgados', 
+      'frios': 'Salgados',
+      'salgados': 'Salgados',
+      'salgado': 'Salgados',
+      'bebida': 'Bebidas',
+      'bebidas': 'Bebidas',
+      'suco': 'Bebidas',
+      'sucos': 'Bebidas',
+      'doce': 'Doces',
+      'doces': 'Doces',
+      'sorvete': 'Sorvetes',
+      'sorvetes': 'Sorvetes',
+      'frango': 'Sorvetes',
+      'bolacha': 'Bolachas',
+      'bolachas': 'Bolachas',
+      'biscoito': 'Bolachas',
+      'biscoitos': 'Bolachas',
+      'queijo': 'Bolachas',
+      'queijos': 'Bolachas',
+      'lanche': 'Lanches',
+      'lanches': 'Lanches',
+    };
+    
+    final key = originalName.toLowerCase();
+    return mapping[key] ?? originalName;
+  }
+  
+  void _loadCategories() {
+    // Extrair categorias únicas dos produtos
+    final Set<String> categoryNames = {'Todos'};
+    
+    for (final produto in _produtos) {
+      if (produto.categoria != null && produto.categoria!['nome'] != null) {
+        final originalName = produto.categoria!['nome'].toString();
+        final mappedName = _mapCategoryName(originalName);
+        categoryNames.add(mappedName);
+      }
+    }
+    
+    setState(() {
+      _categories = categoryNames.toList();
+    });
+    
+    print('Categorias carregadas: $_categories');
+  }
 
   void _loadProdutos() async {
     setState(() {
@@ -71,10 +118,34 @@ class _HomeScreenState extends State<HomeScreen> {
       _produtos = produtos;
       _isLoading = false;
     });
+    
+    // Carregar categorias após carregar produtos
+    _loadCategories();
   }
 
   List<Produto> get _filteredProducts {
     List<Produto> products = _produtos;
+    
+    // Filtrar por categoria
+    if (_selectedCategoryIndex > 0) {
+      final selectedCategory = _categories[_selectedCategoryIndex];
+      print('Filtrando por categoria: $selectedCategory');
+      
+      products = products.where((product) {
+        if (product.categoria != null && product.categoria!['nome'] != null) {
+          final originalCategoryName = product.categoria!['nome'].toString();
+          final mappedCategoryName = _mapCategoryName(originalCategoryName);
+          final match = mappedCategoryName.toLowerCase() == selectedCategory.toLowerCase();
+          if (match) {
+            print('Produto ${product.nome} corresponde à categoria $selectedCategory');
+          }
+          return match;
+        }
+        return false;
+      }).toList();
+      
+      print('Produtos filtrados: ${products.length}');
+    }
     
     // Filtrar por pesquisa
     if (_searchQuery.isNotEmpty) {
@@ -301,6 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final isSelected = index == _selectedCategoryIndex;
               return GestureDetector(
                 onTap: () {
+                  print('Categoria selecionada: ${_categories[index]} (index: $index)');
                   setState(() {
                     _selectedCategoryIndex = index;
                   });

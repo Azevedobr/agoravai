@@ -19,6 +19,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final UserService _userService = UserService();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  // Método chamado quando a tela volta ao foco
+  void _refreshProfile() {
+    setState(() {
+      // Força a reconstrução da tela com os dados atualizados
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -242,9 +254,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.white54,
               size: 16,
             ),
-            onTap: () {
+            onTap: () async {
               if (option['title'] == 'Editar Perfil') {
-                Navigator.pushNamed(context, '/edit-profile');
+                await Navigator.pushNamed(context, '/edit-profile');
+                _refreshProfile(); // Atualiza a tela quando volta da edição
               } else if (option['title'] == 'Histórico') {
                 Navigator.pushNamed(context, '/history');
               } else if (option['title'] == 'Pagamentos') {

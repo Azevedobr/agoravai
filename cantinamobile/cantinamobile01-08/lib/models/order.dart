@@ -30,6 +30,18 @@ class Order {
   List<String> get itemNames {
     return items.map((item) => '${item.name} (${item.quantity}x)').toList();
   }
+
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id']?.toString() ?? '',
+      date: DateTime.tryParse(json['dataPedido'] ?? '') ?? DateTime.now(),
+      items: [], // Será preenchido com os itens do pedido
+      total: (json['valorTotal'] ?? 0.0).toDouble(),
+      paymentMethod: PaymentMethod.card, // Padrão
+      password: json['senha'] ?? '',
+      status: json['status'] == 'CONCLUIDO' ? OrderStatus.completed : OrderStatus.cancelled,
+    );
+  }
 }
 
 enum OrderStatus {

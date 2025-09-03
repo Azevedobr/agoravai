@@ -325,16 +325,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   String _getLanguageName(String code) {
-    switch (code) {
-      case 'pt':
-        return 'Português';
-      case 'en':
-        return 'English';
-      case 'es':
-        return 'Español';
-      default:
-        return 'Português';
-    }
+    return 'Português';
   }
 
   void _showLanguageDialog() {
@@ -346,7 +337,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: AppTheme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          appProvider.translate('select_language'),
+          'Selecionar Idioma',
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -355,29 +346,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            {'code': 'pt', 'name': 'Português'},
-            {'code': 'en', 'name': 'English'},
-            {'code': 'es', 'name': 'Español'},
-          ].map((lang) => 
             ListTile(
-              title: Text(
-                lang['name']!,
-                style: const TextStyle(
+              title: const Text(
+                'Português',
+                style: TextStyle(
                   color: Colors.white,
                 ),
               ),
               leading: Radio<String>(
-                value: lang['code']!,
-                groupValue: appProvider.language,
+                value: 'pt',
+                groupValue: 'pt',
                 onChanged: (value) {
-                  appProvider.changeLanguage(value!);
                   Navigator.pop(context);
                 },
                 activeColor: AppTheme.primaryColor,
               ),
             ),
-          ).toList(),
+          ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: GoogleFonts.poppins(
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

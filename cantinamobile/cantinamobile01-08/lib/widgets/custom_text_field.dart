@@ -10,6 +10,8 @@ class CustomTextField extends StatefulWidget {
   final IconData? prefixIcon;
   final String? Function(String?)? validator;
   final TextEditingController? controller;
+  final bool enabled;
+  final Function(String)? onChanged;
 
   const CustomTextField({
     super.key,
@@ -20,6 +22,8 @@ class CustomTextField extends StatefulWidget {
     this.prefixIcon,
     this.validator,
     this.controller,
+    this.enabled = true,
+    this.onChanged,
   });
 
   @override
@@ -58,15 +62,29 @@ class _CustomTextFieldState extends State<CustomTextField> {
             controller: widget.controller,
             keyboardType: widget.keyboardType,
             obscureText: widget.isPassword ? _obscureText : false,
+            enabled: widget.enabled,
             style: TextStyle(
-              color: Colors.white,
+              color: widget.enabled ? Colors.white : Colors.white.withOpacity(0.6),
               fontSize: Responsive.sp(context, 16),
             ),
             validator: widget.validator,
+            onChanged: widget.onChanged,
             decoration: InputDecoration(
+              filled: true,
+              fillColor: widget.enabled 
+                  ? const Color(0xFF1A1F3A)
+                  : const Color(0xFF1A1F3A).withOpacity(0.5),
               hintText: widget.hint,
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+              ),
               prefixIcon: widget.prefixIcon != null
-                  ? Icon(widget.prefixIcon, color: Colors.white.withOpacity(0.7))
+                  ? Icon(
+                      widget.prefixIcon, 
+                      color: widget.enabled 
+                          ? Colors.white.withOpacity(0.7)
+                          : Colors.white.withOpacity(0.4)
+                    )
                   : null,
               suffixIcon: widget.isPassword
                   ? IconButton(
@@ -75,13 +93,33 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         color: Colors.white.withOpacity(0.7),
                         size: 18,
                       ),
-                      onPressed: () {
+                      onPressed: widget.enabled ? () {
                         setState(() {
                           _obscureText = !_obscureText;
                         });
-                      },
+                      } : null,
                     )
                   : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFF6C63FF),
+                  width: 2,
+                ),
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.all(20),
             ),
           ),
         ),

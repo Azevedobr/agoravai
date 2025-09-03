@@ -5,11 +5,47 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive.dart';
 import '../services/order_service.dart';
+import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import '../models/order.dart';
 import '../models/cart_item.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  List<Order> _orders = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  void _loadOrders() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final currentUser = AuthService().currentUser;
+    if (currentUser != null && currentUser.id != null) {
+      final orders = await ApiService.getUserOrders(currentUser.id!);
+      setState(() {
+        _orders = orders;
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _orders = [];
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +102,15 @@ class HistoryScreen extends StatelessWidget {
   }
 
   Widget _buildOrdersList(BuildContext context) {
-    final orders = OrderService().orders;
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: AppTheme.primaryColor,
+        ),
+      );
+    }
     
-    if (orders.isEmpty) {
+    if (_orders.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,8 +135,8 @@ class HistoryScreen extends StatelessWidget {
     
     return ListView.builder(
       padding: Responsive.paddingHorizontal(context, 6.4),
-      itemCount: orders.length,
-      itemBuilder: (context, index) => _buildOrderCard(context, orders[index], index),
+      itemCount: _orders.length,
+      itemBuilder: (context, index) => _buildOrderCard(context, _orders[index], index),
     );
   }
 

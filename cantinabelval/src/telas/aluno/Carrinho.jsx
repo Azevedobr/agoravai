@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Carrinho.css';
 import { PedidoService, CarrinhoService, UsuarioService } from '../../services';
-import BottomNavigation from '../../components/BottomNavigation';
 import AppHeader from '../../components/AppHeader';
 
 const Carrinho = () => {
@@ -284,8 +283,6 @@ const Carrinho = () => {
           </div>
         </main>
       </div>
-      
-      <BottomNavigation />
     </>
   );
 };

@@ -1,7 +1,7 @@
 .profile-edit-container {
   background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2D1B69 100%);
   min-height: 100vh;
-  padding: 120px 20px 200px;
+  padding: 120px 20px 100px;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -388,30 +388,306 @@
     margin-bottom: 30px;
   }
 }
-/* Seção de informações do usuário (sem foto) */
-.profile-info-section {
-  text-align: center;
-  padding: 20px 40px 20px;
+/* Header do Perfil Moderno */
+.profile-header-section {
+  display: flex;
+  align-items: center;
+  padding: 30px 40px;
   margin-top: 100px;
-  background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(139, 126, 255, 0.05));
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(139, 126, 255, 0.08));
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 24px;
 }
 
-.user-icon {
-  font-size: 80px;
-  margin-bottom: 20px;
-  display: block;
+.profile-avatar {
+  position: relative;
+}
+
+.avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(108, 99, 255, 0.4);
+}
+
+.avatar-badge {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  border: 3px solid #1A1F3A;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.avatar-badge:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #FF5252, #FF7979);
+}
+
+.profile-info {
+  flex: 1;
 }
 
 .profile-name {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: white;
   margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #6C63FF, #8B7EFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .profile-email {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 16px 0;
+}
+
+.profile-status {
+  display: flex;
+  gap: 12px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Menu de Ações Rápidas */
+.quick-actions {
+  display: flex;
+  gap: 16px;
+  padding: 20px 40px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.quick-action-btn:hover {
+  background: rgba(108, 99, 255, 0.2);
+  border-color: rgba(108, 99, 255, 0.3);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.quick-action-btn.active {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+  border-color: #FF6B6B;
+  color: white;
+}
+
+/* Melhorias nos inputs */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper.disabled {
+  opacity: 0.7;
+}
+
+.input-status, .input-lock {
+  position: absolute;
+  right: 50px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+}
+
+.validation-icon {
+  position: absolute;
+  right: 50px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.validation-icon.valid {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.validation-icon.invalid {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.input-wrapper input.valid {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.input-wrapper input.invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.input-help.success {
+  color: #22c55e;
+}
+
+.input-help.error {
+  color: #ef4444;
+}
+
+/* Seção de Segurança */
+.security-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+}
+
+.security-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(108, 99, 255, 0.1);
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.security-notice svg {
+  color: #6C63FF;
+  font-size: 16px;
+}
+
+/* Zona de Perigo */
+.danger-zone {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.danger-zone h4 {
+  color: #ef4444;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-spinner {
+  font-size: 48px;
+  margin-bottom: 20px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsividade Melhorada */
+@media (max-width: 768px) {
+  .profile-header-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    gap: 16px;
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+  }
+  
+  .avatar-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .profile-name {
+    font-size: 24px;
+  }
+  
+  .quick-actions {
+    padding: 16px 20px;
+    justify-content: center;
+  }
+  
+  .security-section {
+    padding: 16px;
+  }
 }

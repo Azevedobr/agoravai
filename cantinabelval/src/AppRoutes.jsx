@@ -6,6 +6,7 @@ import { TelaInicial, Dashboard, PaginaInicial, Pedidos } from "./telas/inicio";
 import Tutorial from "./telas/inicio/Tutorial";
 import { Carrinho, EditarPerfil as EditarPerfilAluno, PagamentoCartao, Menu } from "./telas/aluno";
 import { Funcionarios, Historico, CadastrarProduto, EditarPerfil as EditarPerfilEscola } from "./telas/escola";
+import HistoricoDetalhado from "./telas/escola/HistoricoDetalhado";
 import GerenciarProdutos from "./telas/escola/GerenciarProdutos";
 import CentralAjuda from "./components/CentralAjuda";
 
@@ -26,6 +27,7 @@ const AppRoutes = () => {
       <Route path="/pagamentocartao" element={<PagamentoCartao />} /> 
       <Route path="/funcionarios" element={<Funcionarios />} />
       <Route path="/historico" element={<Historico />} />
+      <Route path="/historico-detalhado/:id" element={<HistoricoDetalhado />} />
       <Route path="/menu" element={<Menu />} />
       <Route path="/pedidos" element={<Pedidos />} />
       <Route path="/esqueceu" element={<EsqueceuSenha />} />

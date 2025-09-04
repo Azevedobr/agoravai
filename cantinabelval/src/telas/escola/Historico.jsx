@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faArrowLeft, faPlus, faSearch, faFilter, faCheck, faTimes, 
+  faEye, faClock, faUser, faCreditCard, faShoppingBag,
+  faCalendarAlt, faMoneyBillWave, faCheckCircle, faTimesCircle,
+  faSpinner, faExclamationTriangle, faDownload, faRefresh
+} from '@fortawesome/free-solid-svg-icons';
 import './Historico.css';
 
 const Historico = () => {
   const navigate = useNavigate();
   const [pedidos, setPedidos] = useState([]);
+  const [pedidosFiltrados, setPedidosFiltrados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('TODOS');
+  const [dateFilter, setDateFilter] = useState('TODOS');
+  const [showFilters, setShowFilters] = useState(false);
+  const [stats, setStats] = useState({ total: 0, ativo: 0, aceito: 0, finalizado: 0, cancelado: 0 });
 
   const carregarPedidos = async () => {
+    setLoading(true);
     try {
       const response = await fetch('http://localhost:8080/pedido/findAll');
       const pedidosData = await response.json();
-      setPedidos(pedidosData.reverse());
+      const pedidosOrdenados = pedidosData.reverse();
+      setPedidos(pedidosOrdenados);
+      calcularEstatisticas(pedidosOrdenados);
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error);
       // Fallback para localStorage
@@ -28,8 +45,68 @@ const Historico = () => {
         pedido && typeof pedido === 'object'
       );
       setPedidos(pedidosValidos);
+      calcularEstatisticas(pedidosValidos);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const calcularEstatisticas = (pedidosData) => {
+    const stats = {
+      total: pedidosData.length,
+      ativo: pedidosData.filter(p => p.statusPedido === 'ATIVO').length,
+      aceito: pedidosData.filter(p => p.statusPedido === 'ACEITO').length,
+      finalizado: pedidosData.filter(p => p.statusPedido === 'FINALIZADO').length,
+      cancelado: pedidosData.filter(p => p.statusPedido === 'CANCELADO').length
+    };
+    setStats(stats);
+  };
+
+  const filtrarPedidos = () => {
+    let pedidosFiltrados = [...pedidos];
+
+    // Filtro por termo de busca
+    if (searchTerm) {
+      pedidosFiltrados = pedidosFiltrados.filter(pedido =>
+        pedido.usuario?.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pedido.id?.toString().includes(searchTerm) ||
+        pedido.infoPedido?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtro por status
+    if (statusFilter !== 'TODOS') {
+      pedidosFiltrados = pedidosFiltrados.filter(pedido => 
+        pedido.statusPedido === statusFilter
+      );
+    }
+
+    // Filtro por data
+    if (dateFilter !== 'TODOS') {
+      const hoje = new Date();
+      pedidosFiltrados = pedidosFiltrados.filter(pedido => {
+        const dataPedido = new Date(pedido.dataPedido);
+        switch (dateFilter) {
+          case 'HOJE':
+            return dataPedido.toDateString() === hoje.toDateString();
+          case 'SEMANA':
+            const semanaAtras = new Date(hoje.getTime() - 7 * 24 * 60 * 60 * 1000);
+            return dataPedido >= semanaAtras;
+          case 'MES':
+            return dataPedido.getMonth() === hoje.getMonth() && 
+                   dataPedido.getFullYear() === hoje.getFullYear();
+          default:
+            return true;
+        }
+      });
+    }
+
+    setPedidosFiltrados(pedidosFiltrados);
+  };
+
+  useEffect(() => {
+    filtrarPedidos();
+  }, [pedidos, searchTerm, statusFilter, dateFilter]);
 
   useEffect(() => {
     carregarPedidos();
@@ -199,71 +276,218 @@ const Historico = () => {
   };
 
   return (
-    <div className="caixa-historico">
-      <div className="conteudo-historico">
-        <h2>Pedidos Recebidos</h2>
-
-        <div className="botoes-acao">
-          <button className="botao-voltar" onClick={handleVoltar}>← Voltar</button>
-          <button className="botao-azul" onClick={inserirPedidoTeste}>+ Adicionar Pedido de Teste</button>
+    <div className="historico-container">
+      {/* Header Moderno */}
+      <div className="historico-header">
+        <div className="header-top">
+          <button className="btn-voltar" onClick={handleVoltar}>
+            <FontAwesomeIcon icon={faArrowLeft} />
+            Voltar
+          </button>
+          <div className="header-actions">
+            <button className="btn-refresh" onClick={carregarPedidos} disabled={loading}>
+              <FontAwesomeIcon icon={loading ? faSpinner : faRefresh} className={loading ? 'spinning' : ''} />
+            </button>
+          </div>
         </div>
+        
+        <div className="header-title">
+          <h1>
+            <FontAwesomeIcon icon={faShoppingBag} />
+            Gerenciar Pedidos
+          </h1>
+          <p>Acompanhe e gerencie todos os pedidos da cantina</p>
+        </div>
+      </div>
 
-        {pedidos.length === 0 ? (
-          <p className="sem-pedidos">Nenhum pedido disponível.</p>
+      {/* Estatísticas */}
+      <div className="stats-grid">
+        <div className="stat-card total">
+          <div className="stat-icon">
+            <FontAwesomeIcon icon={faShoppingBag} />
+          </div>
+          <div className="stat-info">
+            <span className="stat-number">{stats.total}</span>
+            <span className="stat-label">Total de Pedidos</span>
+          </div>
+        </div>
+        
+        <div className="stat-card ativo">
+          <div className="stat-icon">
+            <FontAwesomeIcon icon={faClock} />
+          </div>
+          <div className="stat-info">
+            <span className="stat-number">{stats.ativo}</span>
+            <span className="stat-label">Aguardando</span>
+          </div>
+        </div>
+        
+        <div className="stat-card aceito">
+          <div className="stat-icon">
+            <FontAwesomeIcon icon={faCheckCircle} />
+          </div>
+          <div className="stat-info">
+            <span className="stat-number">{stats.aceito}</span>
+            <span className="stat-label">Aceitos</span>
+          </div>
+        </div>
+        
+        <div className="stat-card finalizado">
+          <div className="stat-icon">
+            <FontAwesomeIcon icon={faCheck} />
+          </div>
+          <div className="stat-info">
+            <span className="stat-number">{stats.finalizado}</span>
+            <span className="stat-label">Finalizados</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Filtros e Busca */}
+      <div className="filters-section">
+        <div className="search-bar">
+          <FontAwesomeIcon icon={faSearch} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar por cliente, ID ou produto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <button 
+          className={`btn-filter ${showFilters ? 'active' : ''}`}
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <FontAwesomeIcon icon={faFilter} />
+          Filtros
+        </button>
+      </div>
+
+      {showFilters && (
+        <div className="filters-panel">
+          <div className="filter-group">
+            <label>Status:</label>
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <option value="TODOS">Todos os Status</option>
+              <option value="ATIVO">Aguardando</option>
+              <option value="ACEITO">Aceitos</option>
+              <option value="FINALIZADO">Finalizados</option>
+              <option value="CANCELADO">Cancelados</option>
+            </select>
+          </div>
+          
+          <div className="filter-group">
+            <label>Período:</label>
+            <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
+              <option value="TODOS">Todos os Períodos</option>
+              <option value="HOJE">Hoje</option>
+              <option value="SEMANA">Última Semana</option>
+              <option value="MES">Este Mês</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Lista de Pedidos */}
+      <div className="pedidos-content">
+        {loading ? (
+          <div className="loading-state">
+            <FontAwesomeIcon icon={faSpinner} className="spinning" />
+            <p>Carregando pedidos...</p>
+          </div>
+        ) : pedidosFiltrados.length === 0 ? (
+          <div className="empty-state">
+            <FontAwesomeIcon icon={faExclamationTriangle} />
+            <h3>Nenhum pedido encontrado</h3>
+            <p>Não há pedidos que correspondam aos filtros selecionados.</p>
+          </div>
         ) : (
-          <div className="lista-pedidos">
-            {pedidos.map((pedido, i) => (
-              <div className="card-pedido" key={i}>
-                <div className="header-card">
-                  <div>
-                    <strong>Pedido #{pedido.id}</strong> - <span className="data-pedido">{formatarData(pedido.dataPedido)}</span>
+          <div className="pedidos-grid">
+            {pedidosFiltrados.map((pedido, i) => (
+              <div className="pedido-card" key={pedido.id || i}>
+                <div className="card-header">
+                  <div className="pedido-id">
+                    <FontAwesomeIcon icon={faShoppingBag} />
+                    <span>#{pedido.id}</span>
                   </div>
                   <span className={`status-badge status-${pedido.statusPedido?.toLowerCase()}`}>
-                    {pedido.statusPedido?.toUpperCase()}
+                    {getStatusIcon(pedido.statusPedido)}
+                    {getStatusText(pedido.statusPedido)}
                   </span>
                 </div>
 
-                <div className="info-pedido">
-                  <p><strong>Cliente:</strong> {pedido.usuario?.nome}</p>
-                  <p><strong>Pagamento:</strong> {pedido.formaPagto}</p>
-                  <p><strong>Informações:</strong> {pedido.infoPedido}</p>
-                </div>
+                <div className="card-body">
+                  <div className="cliente-info">
+                    <FontAwesomeIcon icon={faUser} />
+                    <span>{pedido.usuario?.nome || 'Cliente não identificado'}</span>
+                  </div>
+                  
+                  <div className="pedido-details">
+                    <div className="detail-item">
+                      <FontAwesomeIcon icon={faCalendarAlt} />
+                      <span>{formatarData(pedido.dataPedido)}</span>
+                    </div>
+                    
+                    <div className="detail-item">
+                      <FontAwesomeIcon icon={faCreditCard} />
+                      <span>{pedido.formaPagto}</span>
+                    </div>
+                    
+                    <div className="detail-item valor">
+                      <FontAwesomeIcon icon={faMoneyBillWave} />
+                      <span>R$ {pedido.valor ? pedido.valor.toFixed(2) : '0.00'}</span>
+                    </div>
+                  </div>
 
-                <div className="produtos-pedido">
-                  {pedido.infoPedido && pedido.infoPedido.includes('Itens:') && (
-                    <div className="itens-pedido">
+                  {pedido.infoPedido && (
+                    <div className="pedido-items">
                       <h4>Itens do pedido:</h4>
-                      <p>{pedido.infoPedido.split('Itens: ')[1] || 'Itens não disponíveis'}</p>
+                      <p>{pedido.infoPedido.includes('Itens:') ? 
+                          pedido.infoPedido.split('Itens: ')[1] : 
+                          pedido.infoPedido}
+                      </p>
                     </div>
                   )}
-                  <div className="total-pedido">
-                    <strong>Total: R$ {pedido.valor ? pedido.valor.toFixed(2) : '0.00'}</strong>
-                  </div>
+
+                  {pedido.statusPedido === 'ACEITO' && pedido.senhaPedido && (
+                    <div className="senha-retirada">
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                      <span>Senha: <strong>{pedido.senhaPedido}</strong></span>
+                    </div>
+                  )}
+
+                  {pedido.statusPedido === 'CANCELADO' && (
+                    <div className="cancelamento-info">
+                      <FontAwesomeIcon icon={faTimesCircle} />
+                      <span>Motivo: {pedido.motivoCancelamento || 'Não informado'}</span>
+                    </div>
+                  )}
                 </div>
 
-                {pedido.statusPedido === 'CANCELADO' && (
-                  <p className="motivo-cancelamento">
-                    <strong>Motivo do cancelamento:</strong> {pedido.motivoCancelamento || 'Ver informações do pedido'}
-                  </p>
-                )}
-
-                {pedido.statusPedido === 'ACEITO' && pedido.senhaPedido && (
-                  <div className="pedido-aceito">
-                    <p><strong>Nº do Pedido:</strong> {pedido.id}</p>
-                    <p><strong>Senha para retirada:</strong> <span className="senha-destaque">{pedido.senhaPedido}</span></p>
-                  </div>
-                )}
-
-                <div className="acoes-pedido">
+                <div className="card-actions">
                   {pedido.statusPedido === 'ATIVO' && (
                     <>
-                      <button className="botao-verde" onClick={() => handleAceitar(i)}>Aceitar</button>
-                      <button className="botao-vermelho" onClick={() => handleCancelar(i)}>Cancelar</button>
+                      <button className="btn-aceitar" onClick={() => handleAceitar(i)}>
+                        <FontAwesomeIcon icon={faCheck} />
+                        Aceitar
+                      </button>
+                      <button className="btn-cancelar" onClick={() => handleCancelar(i)}>
+                        <FontAwesomeIcon icon={faTimes} />
+                        Cancelar
+                      </button>
                     </>
                   )}
                   {pedido.statusPedido === 'ACEITO' && (
-                    <button className="botao-azul" onClick={() => handleFinalizar(i)}>Finalizar</button>
+                    <button className="btn-finalizar" onClick={() => handleFinalizar(i)}>
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                      Finalizar
+                    </button>
                   )}
+                  <button className="btn-detalhes" onClick={() => navigate(`/historico-detalhado/${pedido.id}`)}>
+                    <FontAwesomeIcon icon={faEye} />
+                    Detalhes
+                  </button>
                 </div>
               </div>
             ))}
@@ -272,6 +496,26 @@ const Historico = () => {
       </div>
     </div>
   );
+
+  function getStatusIcon(status) {
+    switch (status) {
+      case 'ATIVO': return <FontAwesomeIcon icon={faClock} />;
+      case 'ACEITO': return <FontAwesomeIcon icon={faCheckCircle} />;
+      case 'FINALIZADO': return <FontAwesomeIcon icon={faCheck} />;
+      case 'CANCELADO': return <FontAwesomeIcon icon={faTimesCircle} />;
+      default: return <FontAwesomeIcon icon={faClock} />;
+    }
+  }
+
+  function getStatusText(status) {
+    switch (status) {
+      case 'ATIVO': return 'Aguardando';
+      case 'ACEITO': return 'Aceito';
+      case 'FINALIZADO': return 'Finalizado';
+      case 'CANCELADO': return 'Cancelado';
+      default: return status;
+    }
+  }
 };
 
 export default Historico;

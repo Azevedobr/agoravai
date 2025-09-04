@@ -61,27 +61,7 @@ const PaginaInicial = () => {
               </Link>
             </div>
           </div>
-          <div className="hero-visual">
-            <div className="phone-mockup">
-              <div className="phone-screen">
-                <div className="app-preview">
-                  <div className="app-header">
-                    <span>FinnTech Cantina</span>
-                  </div>
-                  <div className="app-content">
-                    <div className="menu-item">🍔 Salgado - R$ 15,90</div>
-                    <div className="menu-item">🥤 Refrigerante - R$ 4,00</div>
-                    <div className="menu-item">🍟 Batata Frita - R$ 8,50</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="floating-elements">
-              <div className="floating-card card-1">💳 Pagamento Fácil</div>
-              <div className="floating-card card-2">📊 Relatórios</div>
-              <div className="floating-card card-3">🛒 Pedidos Online</div>
-            </div>
-          </div>
+
         </div>
       </section>
 

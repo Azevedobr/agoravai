@@ -234,9 +234,9 @@ const TelaInicial = () => {
               <FiGift className="gift-icon" />
             </div>
             <div className="promo-content">
-              <h3 className="promo-title">Oferta Especial de Lançamento!</h3>
+              <h3 className="promo-title">Produtos mais baratos!</h3>
               <p className="promo-description">
-                Todos os planos GRATUITOS por 1 ano completo. 
+                Todos os produtos mais baratos por 1 ano completo. 
                 Aproveite e modernize sua experiência na cantina.
               </p>
               <Link to="/menu" className="promo-btn">
@@ -246,7 +246,6 @@ const TelaInicial = () => {
             </div>
           </div>
         </section>
-
 
       </main>
     </div>

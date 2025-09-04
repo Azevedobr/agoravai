@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faUser, faEnvelope, faLock, faCamera, faShield, faCog, faSignOutAlt, faTrash, faEdit, faSave, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import './EditarPerfil.css';
 import { useNavigate } from 'react-router-dom';
 import { UsuarioService } from '../../services';
 import AppHeader from '../../components/AppHeader';
-import BottomNavigation from '../../components/BottomNavigation';
 
 function EditarPerfil() {
   const [senhaVisivel, setSenhaVisivel] = useState(false);
@@ -146,185 +145,255 @@ function EditarPerfil() {
   };
 
   const handleDeleteAccount = () => {
-    if (window.confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
-      console.log('Conta excluída com sucesso');
-      navigate('/');
+    if (window.confirm('⚠️ ATENÇÃO: Tem certeza que deseja excluir sua conta?\n\nEsta ação é IRREVERSÍVEL e você perderá:\n• Todos os seus dados\n• Histórico de pedidos\n• Preferências salvas\n\nDigite "EXCLUIR" para confirmar:')) {
+      const confirmacao = prompt('Digite "EXCLUIR" para confirmar a exclusão da conta:');
+      if (confirmacao === 'EXCLUIR') {
+        UsuarioService.logout();
+        alert('Conta excluída com sucesso!');
+        navigate('/');
+      } else {
+        alert('Exclusão cancelada.');
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.confirm('Tem certeza que deseja sair da sua conta?')) {
+      UsuarioService.logout();
+      navigate('/entraraluno');
     }
   };
 
   return (
     <>
-      <AppHeader title="Editar Perfil" subtitle="Atualize suas informações" showBack={true} showCart={false} />
+      <AppHeader title="Meu Perfil" subtitle="Gerencie suas informações" showBack={true} showCart={false} />
       
       {loading ? (
         <div className="profile-edit-container">
           <div className="loading-state">
+            <div className="loading-spinner">⏳</div>
             <p>Carregando dados do perfil...</p>
           </div>
         </div>
       ) : (
         <div className="profile-edit-container">
-        <div className="profile-content">
-          {/* Seção de informações do usuário */}
-          <div className="profile-info-section">
-            <div className="user-icon">👤</div>
-            <h2 className="profile-name">{userData.nome}</h2>
-            <p className="profile-email">{userData.email}</p>
-          </div>
+          <div className="profile-content">
+            {/* Header do Perfil */}
+            <div className="profile-header-section">
+              <div className="profile-avatar">
+                <div className="avatar-container">
+                  <div className="user-avatar">👤</div>
+                  <div className="avatar-badge">
+                    <FontAwesomeIcon icon={faCamera} />
+                  </div>
+                </div>
+              </div>
+              <div className="profile-info">
+                <h2 className="profile-name">{userData.nome}</h2>
+                <p className="profile-email">{userData.email}</p>
+                <div className="profile-status">
+                  <span className="status-badge active">
+                    <FontAwesomeIcon icon={faCheck} />
+                    Conta Ativa
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          {/* Formulário */}
-          <form onSubmit={handleSubmit} className="profile-form">
-            <div className="form-section">
-              <h3 className="section-title">
-                <FontAwesomeIcon icon={faUser} />
-                Informações Pessoais
-              </h3>
-              
-              <div className="form-group">
-                <label>Nome Completo</label>
-                <div className="input-wrapper">
-                  <FontAwesomeIcon icon={faUser} className="input-icon" />
-                  <input
-                    type="text"
-                    value={userData.nome}
-                    onChange={(e) => setUserData({ ...userData, nome: e.target.value })}
-                    placeholder="Digite seu nome completo"
-                    disabled={!isEditing}
-                    required
-                  />
+            {/* Menu de Ações Rápidas */}
+            <div className="quick-actions">
+              <button 
+                className={`quick-action-btn ${isEditing ? 'active' : ''}`}
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                <FontAwesomeIcon icon={isEditing ? faTimes : faEdit} />
+                <span>{isEditing ? 'Cancelar' : 'Editar'}</span>
+              </button>
+              <button className="quick-action-btn" onClick={handleLogout}>
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <span>Sair</span>
+              </button>
+            </div>
+
+            {/* Formulário */}
+            <form onSubmit={handleSubmit} className="profile-form">
+              <div className="form-section">
+                <h3 className="section-title">
+                  <FontAwesomeIcon icon={faUser} />
+                  Informações Pessoais
+                </h3>
+                
+                <div className="form-group">
+                  <label>Nome Completo</label>
+                  <div className={`input-wrapper ${!isEditing ? 'disabled' : ''}`}>
+                    <FontAwesomeIcon icon={faUser} className="input-icon" />
+                    <input
+                      type="text"
+                      value={userData.nome}
+                      onChange={(e) => setUserData({ ...userData, nome: e.target.value })}
+                      placeholder="Digite seu nome completo"
+                      disabled={!isEditing}
+                      required
+                    />
+                    {isEditing && (
+                      <div className="input-status">
+                        <FontAwesomeIcon icon={faEdit} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Email</label>
+                  <div className="input-wrapper disabled">
+                    <FontAwesomeIcon icon={faEnvelope} className="input-icon" />
+                    <input
+                      type="email"
+                      value={userData.email}
+                      placeholder="seu@email.com"
+                      disabled
+                    />
+                    <div className="input-lock">
+                      <FontAwesomeIcon icon={faLock} />
+                    </div>
+                  </div>
+                  <span className="input-help">📧 O email não pode ser alterado por segurança</span>
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Email</label>
-                <div className="input-wrapper disabled">
-                  <FontAwesomeIcon icon={faEnvelope} className="input-icon" />
-                  <input
-                    type="email"
-                    value={userData.email}
-                    placeholder="seu@email.com"
-                    disabled
-                  />
-                </div>
-                <span className="input-help">O email não pode ser alterado</span>
-              </div>
-
-
-            </div>
-
-            <div className="form-section">
-              <h3 className="section-title">
-                <FontAwesomeIcon icon={faLock} />
-                Segurança
-              </h3>
-
               {isEditing && (
-                <div className="form-group">
-                  <label>Senha Atual</label>
-                  <div className="input-wrapper">
-                    <FontAwesomeIcon icon={faLock} className="input-icon" />
-                    <input
-                      type={senhaAtualVisivel ? 'text' : 'password'}
-                      value={senhaAtual}
-                      onChange={(e) => {
-                        setSenhaAtual(e.target.value);
-                        verificarSenhaAtual(e.target.value);
+                <div className="form-section security-section">
+                  <h3 className="section-title">
+                    <FontAwesomeIcon icon={faShield} />
+                    Alterar Senha
+                  </h3>
+
+                  <div className="security-notice">
+                    <FontAwesomeIcon icon={faShield} />
+                    <span>Para sua segurança, confirme sua senha atual antes de alterá-la</span>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Senha Atual</label>
+                    <div className="input-wrapper">
+                      <FontAwesomeIcon icon={faLock} className="input-icon" />
+                      <input
+                        type={senhaAtualVisivel ? 'text' : 'password'}
+                        value={senhaAtual}
+                        onChange={(e) => {
+                          setSenhaAtual(e.target.value);
+                          verificarSenhaAtual(e.target.value);
+                        }}
+                        placeholder="Digite sua senha atual"
+                        className={senhaAtual ? (senhaAtualValida ? 'valid' : 'invalid') : ''}
+                      />
+                      <FontAwesomeIcon
+                        icon={senhaAtualVisivel ? faEyeSlash : faEye}
+                        className="password-toggle"
+                        onClick={() => setSenhaAtualVisivel(!senhaAtualVisivel)}
+                      />
+                      {senhaAtual && (
+                        <div className={`validation-icon ${senhaAtualValida ? 'valid' : 'invalid'}`}>
+                          <FontAwesomeIcon icon={senhaAtualValida ? faCheck : faTimes} />
+                        </div>
+                      )}
+                    </div>
+                    {senhaAtual && (
+                      <span className={`input-help ${senhaAtualValida ? 'success' : 'error'}`}>
+                        {senhaAtualValida ? '✅ Senha confirmada' : '❌ Senha incorreta'}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label>Nova Senha</label>
+                    <div className="input-wrapper">
+                      <FontAwesomeIcon icon={faLock} className="input-icon" />
+                      <input
+                        type={senhaVisivel ? 'text' : 'password'}
+                        value={senha}
+                        onChange={(e) => setSenha(e.target.value)}
+                        placeholder="Digite uma nova senha"
+                        disabled={!senhaAtualValida}
+                      />
+                      <FontAwesomeIcon
+                        icon={senhaVisivel ? faEyeSlash : faEye}
+                        className="password-toggle"
+                        onClick={() => setSenhaVisivel(!senhaVisivel)}
+                      />
+                    </div>
+                    <span className="input-help">🔒 Deixe em branco para manter a senha atual</span>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Confirmar Nova Senha</label>
+                    <div className="input-wrapper">
+                      <FontAwesomeIcon icon={faLock} className="input-icon" />
+                      <input
+                        type={confirmaSenhaVisivel ? 'text' : 'password'}
+                        value={confirmaSenha}
+                        onChange={(e) => setConfirmaSenha(e.target.value)}
+                        placeholder="Confirme a nova senha"
+                        disabled={!senhaAtualValida}
+                        className={senha && confirmaSenha ? (senha === confirmaSenha ? 'valid' : 'invalid') : ''}
+                      />
+                      <FontAwesomeIcon
+                        icon={confirmaSenhaVisivel ? faEyeSlash : faEye}
+                        className="password-toggle"
+                        onClick={() => setConfirmaSenhaVisivel(!confirmaSenhaVisivel)}
+                      />
+                      {senha && confirmaSenha && (
+                        <div className={`validation-icon ${senha === confirmaSenha ? 'valid' : 'invalid'}`}>
+                          <FontAwesomeIcon icon={senha === confirmaSenha ? faCheck : faTimes} />
+                        </div>
+                      )}
+                    </div>
+                    {senha && confirmaSenha && (
+                      <span className={`input-help ${senha === confirmaSenha ? 'success' : 'error'}`}>
+                        {senha === confirmaSenha ? '✅ Senhas coincidem' : '❌ Senhas não coincidem'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Ações */}
+              {isEditing && (
+                <div className="form-actions">
+                  <div className="danger-zone">
+                    <h4>⚠️ Zona de Perigo</h4>
+                    <button type="button" className="delete-btn" onClick={handleDeleteAccount}>
+                      <FontAwesomeIcon icon={faTrash} />
+                      Excluir Conta
+                    </button>
+                  </div>
+                  
+                  <div className="action-buttons">
+                    <button 
+                      type="button" 
+                      className="cancel-btn" 
+                      onClick={() => {
+                        setIsEditing(false);
+                        setSenhaAtual('');
+                        setSenha('');
+                        setConfirmaSenha('');
+                        setSenhaAtualValida(false);
                       }}
-                      placeholder="Digite sua senha atual"
-                      style={{
-                        borderColor: senhaAtual ? (senhaAtualValida ? '#22c55e' : '#ef4444') : 'rgba(255, 255, 255, 0.2)'
-                      }}
-                    />
-                    <FontAwesomeIcon
-                      icon={senhaAtualVisivel ? faEyeSlash : faEye}
-                      className="password-toggle"
-                      onClick={() => setSenhaAtualVisivel(!senhaAtualVisivel)}
-                    />
-                  </div>
-                  <span className="input-help">Necessário para alterar a senha</span>
-                </div>
-              )}
-
-              {isEditing && (
-                <div className="form-group">
-                  <label>Nova Senha</label>
-                  <div className="input-wrapper">
-                    <FontAwesomeIcon icon={faLock} className="input-icon" />
-                    <input
-                      type={senhaVisivel ? 'text' : 'password'}
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
-                      placeholder="Digite uma nova senha"
-                      disabled={!senhaAtualValida}
-                    />
-                    <FontAwesomeIcon
-                      icon={senhaVisivel ? faEyeSlash : faEye}
-                      className="password-toggle"
-                      onClick={() => setSenhaVisivel(!senhaVisivel)}
-                    />
-                  </div>
-                  <span className="input-help">Deixe em branco para manter a senha atual</span>
-                </div>
-              )}
-
-              {isEditing && (
-                <div className="form-group">
-                  <label>Confirmar Nova Senha</label>
-                  <div className="input-wrapper">
-                    <FontAwesomeIcon icon={faLock} className="input-icon" />
-                    <input
-                      type={confirmaSenhaVisivel ? 'text' : 'password'}
-                      value={confirmaSenha}
-                      onChange={(e) => setConfirmaSenha(e.target.value)}
-                      placeholder="Confirme a nova senha"
-                      disabled={!senhaAtualValida}
-                    />
-                    <FontAwesomeIcon
-                      icon={confirmaSenhaVisivel ? faEyeSlash : faEye}
-                      className="password-toggle"
-                      onClick={() => setConfirmaSenhaVisivel(!confirmaSenhaVisivel)}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Ações */}
-            <div className="form-actions">
-              {isEditing && (
-                <button type="button" className="delete-btn" onClick={handleDeleteAccount}>
-                  🗑️ Excluir Conta
-                </button>
-              )}
-              <div className="action-buttons">
-                {!isEditing ? (
-                  <button type="button" className="save-btn" onClick={() => setIsEditing(true)}>
-                    ✏️ Editar Perfil
-                  </button>
-                ) : (
-                  <>
-                    <button type="button" className="cancel-btn" onClick={() => {
-                      setIsEditing(false);
-                      setSenhaAtual('');
-                      setSenha('');
-                      setConfirmaSenha('');
-                      setSenhaAtualValida(false);
-                    }}>
+                    >
+                      <FontAwesomeIcon icon={faTimes} />
                       Cancelar
                     </button>
                     <button type="submit" className="save-btn">
-                      💾 Salvar Alterações
+                      <FontAwesomeIcon icon={faSave} />
+                      Salvar Alterações
                     </button>
-                  </>
-                )}
-              </div>
-            </div>
-          </form>
+                  </div>
+                </div>
+              )}
+            </form>
+          </div>
         </div>
-      </div>
       )}
-      
-      <BottomNavigation />
     </>
   );
 }

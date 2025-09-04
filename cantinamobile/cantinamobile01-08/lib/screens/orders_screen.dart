@@ -4,20 +4,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive.dart';
-import '../services/order_service.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../models/order.dart';
 import '../models/cart_item.dart';
 
-class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+class OrdersScreen extends StatefulWidget {
+  const OrdersScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class _OrdersScreenState extends State<OrdersScreen> {
   List<Order> _orders = [];
   bool _isLoading = true;
 
@@ -87,7 +86,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ).animate().fadeIn().slideX(begin: -0.3),
           const Spacer(),
           Text(
-            'Histórico',
+            'Meus Pedidos',
             style: GoogleFonts.poppins(
               fontSize: Responsive.sp(context, 20),
               fontWeight: FontWeight.bold,
@@ -116,7 +115,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const FaIcon(
-              FontAwesomeIcons.history,
+              FontAwesomeIcons.shoppingCart,
               size: 80,
               color: Colors.white54,
             ),
@@ -126,6 +125,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
               style: GoogleFonts.poppins(
                 fontSize: Responsive.sp(context, 18),
                 color: Colors.white54,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Faça seu primeiro pedido!',
+              style: GoogleFonts.poppins(
+                fontSize: Responsive.sp(context, 14),
+                color: Colors.white38,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+              icon: const FaIcon(FontAwesomeIcons.utensils, size: 16),
+              label: const Text('Explorar Menu'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
             ),
           ],
@@ -202,7 +220,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           const SizedBox(height: 16),
           
           // Informações do pedido
-          _buildInfoRow('Pagamento:', order.paymentMethod.displayName, order.paymentMethod.icon),
+          _buildInfoRow('Cliente:', AuthService().currentUser?.nome ?? 'Usuário'),
+          const SizedBox(height: 8),
+          _buildInfoRow('Pagamento:', order.paymentMethod.displayName),
           
           const SizedBox(height: 12),
           
@@ -270,6 +290,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       color: Colors.red,
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Este pedido foi cancelado pela escola.',
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.sp(context, 12),
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
@@ -288,9 +317,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const FaIcon(
-                        FontAwesomeIcons.key,
+                        FontAwesomeIcons.checkCircle,
                         color: AppTheme.primaryColor,
-                        size: 16,
+                        size: 20,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -303,30 +332,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Nº do Pedido: ${order.id}',
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.sp(context, 13),
+                      color: Colors.white70,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Senha para retirada: ',
+                        'Senha: ',
                         style: GoogleFonts.poppins(
                           fontSize: Responsive.sp(context, 13),
                           color: Colors.white70,
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppTheme.primaryColor,
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           order.password,
                           style: GoogleFonts.poppins(
-                            fontSize: Responsive.sp(context, 16),
+                            fontSize: Responsive.sp(context, 18),
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
-                            letterSpacing: 2,
+                            letterSpacing: 3,
                           ),
                         ),
                       ),
@@ -363,6 +400,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(height: 4),
                   Text(
                     'Seu pedido foi enviado para a escola e está aguardando confirmação.',
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.sp(context, 12),
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ] else if (order.status == OrderStatus.completed) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue, width: 1),
+              ),
+              child: Column(
+                children: [
+                  const FaIcon(
+                    FontAwesomeIcons.checkDouble,
+                    color: Colors.blue,
+                    size: 20,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Pedido Finalizado',
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.sp(context, 14),
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Este pedido foi entregue e finalizado.',
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.sp(context, 12),
                       color: Colors.white70,
@@ -411,14 +485,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     ).animate(delay: (index * 100).ms).fadeIn().slideY(begin: 0.3);
   }
   
-  Widget _buildInfoRow(String label, String value, String icon) {
+  Widget _buildInfoRow(String label, String value) {
     return Row(
       children: [
-        Text(
-          icon,
-          style: const TextStyle(fontSize: 16),
-        ),
-        const SizedBox(width: 8),
         Text(
           label,
           style: GoogleFonts.poppins(

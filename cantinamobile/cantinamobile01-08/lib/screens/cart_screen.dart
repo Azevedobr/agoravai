@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/cart_item.dart';
 import '../theme/app_theme.dart';
 import '../widgets/gradient_button.dart';
 import '../services/order_service.dart';
 import '../services/cart_service.dart';
+import '../services/auth_service.dart';
+import '../services/api_service.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -319,7 +322,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void _finalizePurchase() {
+  void _finalizePurchase() async {
     if (selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -330,125 +333,226 @@ class _CartScreenState extends State<CartScreen> {
       return;
     }
 
-    // Criar o pedido e adicionar ao histórico
-    final order = OrderService().createOrder(
-      items: _cartService.items,
-      total: _cartService.totalAmount,
-      paymentMethod: selectedPaymentMethod!,
-    );
+    // Verificar se o usuário está logado
+    final currentUser = AuthService().currentUser;
+    if (currentUser == null || currentUser.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Você precisa estar logado para fazer um pedido!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
+    // Mostrar loading
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            const FaIcon(
-              FontAwesomeIcons.checkCircle,
-              color: Colors.green,
-              size: 24,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppTheme.primaryColor),
+      ),
+    );
+
+    try {
+      // Criar string com itens do pedido
+      final itensTexto = _cartService.items.map((item) => 
+        '${item.name} (${item.quantity}x) - R\$ ${(item.price * item.quantity).toStringAsFixed(2)}'
+      ).join('; ');
+      
+      // Preparar dados do pedido
+      final orderData = {
+        'usuario': {'id': currentUser.id},
+        'valor': _cartService.totalAmount,
+        'formaPagto': selectedPaymentMethod!.displayName.toUpperCase(),
+        'infoPedido': 'Pedido de ${currentUser.nome} - Itens: $itensTexto',
+        'statusPedido': 'ATIVO',
+        'dataPedido': DateTime.now().toIso8601String(),
+      };
+      
+      // Enviar pedido para o backend
+      final success = await ApiService.createOrder(orderData);
+      
+      // Fechar loading
+      Navigator.of(context).pop();
+      
+      if (success) {
+        // Mostrar sucesso
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            backgroundColor: AppTheme.cardColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(width: 12),
-            const Text(
-              'Pedido Confirmado!',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Pedido: ${order.id}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Pagamento: ${selectedPaymentMethod!.displayName}',
-              style: const TextStyle(color: Colors.white70),
-            ),
-            Text(
-              'Total: R\$ ${_cartService.totalAmount.toStringAsFixed(2)}',
-              style: const TextStyle(color: Colors.white70),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppTheme.primaryColor,
-                  width: 1,
+            title: Row(
+              children: [
+                const FaIcon(
+                  FontAwesomeIcons.checkCircle,
+                  color: Colors.green,
+                  size: 24,
                 ),
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Senha do Pedido',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    order.password,
-                    style: TextStyle(
+                const SizedBox(width: 12),
+                const Text(
+                  'Pedido Enviado!',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pagamento: ${selectedPaymentMethod!.displayName}',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                Text(
+                  'Total: R\$ ${_cartService.totalAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
                       color: AppTheme.primaryColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 4,
+                      width: 1,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Anote esta senha para retirar seu pedido',
-                    style: TextStyle(
-                      color: Colors.white54,
-                      fontSize: 12,
+                  child: Column(
+                    children: [
+                      const FaIcon(
+                        FontAwesomeIcons.paperPlane,
+                        color: AppTheme.primaryColor,
+                        size: 24,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Pedido enviado para a escola!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Seu pedido foi enviado e está aguardando confirmação da escola.',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.orange, width: 1),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.clock,
+                                  color: Colors.orange,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Próximos passos:',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '• Se ACEITO: Você receberá uma senha para retirada\n• Se CANCELADO: O pedido aparecerá como cancelado',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.white70,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _cartService.clearCart();
+                      setState(() {
+                        selectedPaymentMethod = null;
+                      });
+                      Navigator.pushReplacementNamed(context, '/home');
+                    },
+                    child: Text(
+                      'Continuar Comprando',
+                      style: TextStyle(color: Colors.white70),
                     ),
-                    textAlign: TextAlign.center,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _cartService.clearCart();
+                      setState(() {
+                        selectedPaymentMethod = null;
+                      });
+                      Navigator.pushReplacementNamed(context, '/orders');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Ver Meus Pedidos'),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _cartService.clearCart();
-              setState(() {
-                selectedPaymentMethod = null;
-              });
-              
-              // Mostrar mensagem de sucesso
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Pedido adicionado ao histórico!'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            child: Text(
-              'OK',
-              style: TextStyle(color: AppTheme.primaryColor),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      } else {
+        // Mostrar erro
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao enviar pedido. Tente novamente.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Fechar loading
+      Navigator.of(context).pop();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

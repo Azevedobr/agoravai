@@ -12,9 +12,8 @@ import 'screens/cart_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/history_screen.dart';
-
+import 'screens/orders_screen.dart';
 import 'screens/payments_screen.dart';
-
 import 'screens/settings_screen.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/terms_screen.dart';
@@ -58,7 +57,7 @@ class FinnTechApp extends StatelessWidget {
             '/profile': (context) => const ProfileScreen(),
             '/edit-profile': (context) => const EditProfileScreen(),
             '/history': (context) => const HistoryScreen(),
-
+            '/orders': (context) => const OrdersScreen(),
             '/payments': (context) => const PaymentsScreen(),
 
             '/settings': (context) => const SettingsScreen(),

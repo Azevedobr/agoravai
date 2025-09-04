@@ -10,5 +10,6 @@ import br.itb.projeto.cantina.model.entity.Pedido;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
-    // Aqui você pode adicionar métodos customizados de consulta, se necessário
+    // Buscar pedidos por usuário ordenados por data (mais recentes primeiro)
+    List<Pedido> findByUsuario_IdOrderByDataPedidoDesc(Long usuarioId);
 }

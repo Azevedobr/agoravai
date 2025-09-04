@@ -135,6 +135,60 @@ public class UsuarioController {
 		return ResponseEntity.badRequest()
 						.body(new MessageResponse("Dados Incorretos!"));
 	}
+	
+	@PutMapping("/atualizarPerfil/{id}")
+	public ResponseEntity<?> atualizarPerfil(@PathVariable long id, @RequestBody Usuario usuario) {
+		
+		Usuario _usuario = usuarioService.atualizarPerfil(id, usuario);
+		
+		if (_usuario != null) {
+			return ResponseEntity.ok()
+					.body(new MessageResponse("Perfil atualizado com sucesso!"));
+		} else {
+			return ResponseEntity.badRequest()
+					.body(new MessageResponse("Erro ao atualizar perfil. Email pode já estar em uso!"));
+		}
+	}
+	
+	@PostMapping("/validatePassword")
+	public ResponseEntity<?> validatePassword(@RequestBody java.util.Map<String, Object> request) {
+		try {
+			long userId = Long.parseLong(request.get("userId").toString());
+			String password = request.get("password").toString();
+			
+			boolean isValid = usuarioService.validatePassword(userId, password);
+			
+			java.util.Map<String, Boolean> response = new java.util.HashMap<>();
+			response.put("valid", isValid);
+			
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new MessageResponse("Erro ao validar senha!"));
+		}
+	}
+	
+	@PutMapping("/changePassword")
+	public ResponseEntity<?> changePassword(@RequestBody java.util.Map<String, Object> request) {
+		try {
+			long userId = Long.parseLong(request.get("userId").toString());
+			String currentPassword = request.get("currentPassword").toString();
+			String newPassword = request.get("newPassword").toString();
+			
+			boolean success = usuarioService.changePassword(userId, currentPassword, newPassword);
+			
+			if (success) {
+				return ResponseEntity.ok()
+						.body(new MessageResponse("Senha alterada com sucesso!"));
+			} else {
+				return ResponseEntity.badRequest()
+						.body(new MessageResponse("Senha atual incorreta!"));
+			}
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+					.body(new MessageResponse("Erro ao alterar senha!"));
+		}
+	}
 }
 
 

@@ -122,121 +122,92 @@ class ApiService {
   }
 
   static Future<List<Order>> getUserOrders(int userId) async {
-    // Lista de endpoints possíveis para pedidos
-    final endpoints = [
-      '$baseUrl/pedido/usuario/$userId',
-      '$baseUrl/pedidos/usuario/$userId',
-      '$baseUrl/pedido/findByUsuario/$userId',
-      '$baseUrl/pedido/findAll',
-    ];
-    
-    for (String endpoint in endpoints) {
-      try {
-        print('Tentando endpoint: $endpoint');
-        
-        final response = await http.get(
-          Uri.parse(endpoint),
+    try {
+      print('Buscando pedidos para usuário: $userId');
+      
+      // Primeiro tenta buscar por usuário específico
+      var response = await http.get(
+        Uri.parse('$baseUrl/pedido/usuario/$userId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print('Status Code (específico): ${response.statusCode}');
+      
+      // Se não funcionar, busca todos os pedidos e filtra
+      if (response.statusCode != 200) {
+        print('Endpoint específico não funcionou, buscando todos os pedidos...');
+        response = await http.get(
+          Uri.parse('$baseUrl/pedido/findAll'),
           headers: {'Content-Type': 'application/json'},
         );
-
-        print('Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-          try {
-            final responseData = jsonDecode(response.body);
-            if (responseData is Map && responseData.containsKey('error')) {
-              print('Endpoint retornou erro: ${responseData['error']}');
-              continue;
-            }
-            
-            List<dynamic> data = responseData is List ? responseData : [];
-            print('Sucesso com endpoint: $endpoint');
-            return data.map((json) => Order.fromJson(json)).toList();
-          } catch (e) {
-            print('Erro ao processar resposta: $e');
-            continue;
-          }
-        }
-      } catch (e) {
-        print('Erro ao tentar $endpoint: $e');
+        
+        print('Status Code (findAll): ${response.statusCode}');
       }
+      
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        
+        if (responseData is List) {
+          // Filtrar pedidos do usuário logado
+          final userOrders = responseData.where((pedidoData) {
+            final usuario = pedidoData['usuario'];
+            return usuario != null && usuario['id'] == userId;
+          }).toList();
+          
+          print('Encontrados ${userOrders.length} pedidos para o usuário $userId de ${responseData.length} total');
+          
+          // Ordenar por data (mais recentes primeiro)
+          userOrders.sort((a, b) {
+            final dateA = DateTime.tryParse(a['dataPedido'] ?? '') ?? DateTime.now();
+            final dateB = DateTime.tryParse(b['dataPedido'] ?? '') ?? DateTime.now();
+            return dateB.compareTo(dateA);
+          });
+          
+          return userOrders.map((json) => Order.fromJson(json)).toList();
+        } else {
+          print('Resposta não é uma lista: $responseData');
+          return [];
+        }
+      } else {
+        print('Erro ao buscar pedidos: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erro ao buscar pedidos do usuário: $e');
+      return [];
     }
-    
-    print('Nenhum endpoint de pedidos funcionou - retornando lista vazia');
-    return [];
   }
 
   static Future<bool> updateUser(int userId, String nome, String email) async {
-    // Baseado na resposta do backend, vamos tentar PUT direto no endpoint de usuários
-    final endpoints = [
-      '$baseUrl/usuario/$userId',
-      '$baseUrl/usuarios/$userId', 
-      '$baseUrl/usuario/update/$userId',
-      '$baseUrl/usuario/editar/$userId',
-      '$baseUrl/usuario/atualizar/$userId',
-      '$baseUrl/api/usuario/$userId',
-      '$baseUrl/api/usuarios/$userId',
-      '$baseUrl/usuario/signup', // Tentar usar signup como update temporário
-    ];
-    
-    for (String endpoint in endpoints) {
-      try {
-        print('Tentando endpoint: $endpoint');
-        print('Dados: {"nome": "$nome", "email": "$email"}');
-        
-        // Tentar primeiro PATCH, depois PUT
-        var response = await http.patch(
-          Uri.parse(endpoint),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'nome': nome,
-            'email': email,
-          }),
-        );
-        
-        // Se PATCH não funcionar, tentar PUT
-        if (response.statusCode == 405 || response.statusCode == 404) {
-          response = await http.put(
-            Uri.parse(endpoint),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'nome': nome,
-              'email': email,
-            }),
-          );
-        }
+    try {
+      print('Atualizando usuário $userId com nome: $nome, email: $email');
+      
+      final response = await http.put(
+        Uri.parse('$baseUrl/usuario/atualizarPerfil/$userId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'nome': nome,
+          'email': email,
+        }),
+      );
 
-        print('Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-        
-        if (response.statusCode == 200) {
-          // Verificar se a resposta contém erro
-          try {
-            final responseData = jsonDecode(response.body);
-            if (responseData is Map && responseData.containsKey('error')) {
-              print('Endpoint retornou erro: ${responseData['error']}');
-              continue; // Tenta próximo endpoint
-            }
-          } catch (e) {
-            // Se não conseguir fazer parse, assume que é sucesso
-          }
-          print('Sucesso com endpoint: $endpoint');
-          return true;
-        }
-        
-        // Se não for 404, pode ser outro erro, então continua tentando
-        if (response.statusCode != 404) {
-          print('Erro ${response.statusCode} em $endpoint: ${response.body}');
-        }
-        
-      } catch (e) {
-        print('Erro ao tentar $endpoint: $e');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      
+      if (response.statusCode == 200) {
+        print('Perfil atualizado com sucesso!');
+        return true;
+      } else {
+        print('Erro ao atualizar perfil: ${response.statusCode}');
+        return false;
       }
+      
+    } catch (e) {
+      print('Erro ao atualizar usuário: $e');
+      return false;
     }
-    
-    print('Nenhum endpoint funcionou - falha na atualização');
-    return false; // Falha se nenhum endpoint funcionar
   }
   
   // Método auxiliar para buscar usuário por email
@@ -306,5 +277,26 @@ class ApiService {
     }
     
     throw Exception('Erro ao alterar senha: ${response.statusCode}');
+  }
+  
+  // Método para criar pedido
+  static Future<bool> createOrder(Map<String, dynamic> orderData) async {
+    try {
+      print('Criando pedido: $orderData');
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/pedido/create'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(orderData),
+      );
+      
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Erro ao criar pedido: $e');
+      return false;
+    }
   }
 }

@@ -623,10 +623,13 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildNavItem(FontAwesomeIcons.home, 'Início', true),
           GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/orders'),
+            child: _buildNavItem(FontAwesomeIcons.shoppingBag, 'Pedidos', false),
+          ),
+          GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/history'),
             child: _buildNavItem(FontAwesomeIcons.history, 'Histórico', false),
           ),
-
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/profile'),
             child: _buildNavItem(FontAwesomeIcons.user, 'Perfil', false),
@@ -703,6 +706,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     FontAwesomeIcons.shoppingCart,
                     appProvider.translate('cart') ?? 'Carrinho',
                     () => Navigator.pushNamed(context, '/cart'),
+                  ),
+                  _buildDrawerItem(
+                    FontAwesomeIcons.shoppingBag,
+                    'Meus Pedidos',
+                    () => Navigator.pushNamed(context, '/orders'),
                   ),
                   _buildDrawerItem(
                     FontAwesomeIcons.history,

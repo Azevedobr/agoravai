@@ -139,6 +139,13 @@ public class UsuarioService {
 			Usuario usuarioAtualizado = _usuario.get();
 		
 			usuarioAtualizado.setNome(usuario.getNome());
+			// Verificar se o email não está sendo usado por outro usuário
+			if (usuario.getEmail() != null && !usuario.getEmail().isEmpty()) {
+				Usuario usuarioComEmail = usuarioRepository.findByEmail(usuario.getEmail());
+				if (usuarioComEmail == null || usuarioComEmail.getId() == id) {
+					usuarioAtualizado.setEmail(usuario.getEmail());
+				}
+			}
 			usuarioAtualizado.setNivelAcesso(usuario.getNivelAcesso());
 			
 			if (file != null && file.getSize() > 0) {
@@ -206,6 +213,77 @@ public class UsuarioService {
 			return usuarioRepository.save(usuarioAtualizado);
 		}
 		return null;
+	}
+
+	@Transactional
+	public Usuario atualizarPerfil(long id, Usuario usuario) {
+		Optional<Usuario> _usuario = usuarioRepository.findById(id);
+
+		if (_usuario.isPresent()) {
+			Usuario usuarioAtualizado = _usuario.get();
+			
+			// Atualizar nome
+			if (usuario.getNome() != null && !usuario.getNome().isEmpty()) {
+				usuarioAtualizado.setNome(usuario.getNome());
+			}
+			
+			// Verificar se o email não está sendo usado por outro usuário
+			if (usuario.getEmail() != null && !usuario.getEmail().isEmpty()) {
+				Usuario usuarioComEmail = usuarioRepository.findByEmail(usuario.getEmail());
+				if (usuarioComEmail == null || usuarioComEmail.getId() == id) {
+					usuarioAtualizado.setEmail(usuario.getEmail());
+				} else {
+					// Email já está em uso por outro usuário
+					return null;
+				}
+			}
+
+			return usuarioRepository.save(usuarioAtualizado);
+		}
+		return null;
+	}
+	
+	public boolean validatePassword(long userId, String password) {
+		Optional<Usuario> _usuario = usuarioRepository.findById(userId);
+		
+		if (_usuario.isPresent()) {
+			Usuario usuario = _usuario.get();
+			
+			// Decodificar a senha armazenada no banco
+			byte[] decodedPass = Base64.getDecoder().decode(usuario.getSenha());
+			String senhaDecodificada = new String(decodedPass);
+			
+			// Comparar com a senha fornecida
+			return senhaDecodificada.equals(password);
+		}
+		
+		return false;
+	}
+	
+	@Transactional
+	public boolean changePassword(long userId, String currentPassword, String newPassword) {
+		// Primeiro validar se a senha atual está correta
+		if (!validatePassword(userId, currentPassword)) {
+			return false;
+		}
+		
+		Optional<Usuario> _usuario = usuarioRepository.findById(userId);
+		
+		if (_usuario.isPresent()) {
+			Usuario usuario = _usuario.get();
+			
+			// Codificar a nova senha
+			String novaSenhaCodificada = Base64.getEncoder().encodeToString(newPassword.getBytes());
+			
+			// Atualizar a senha
+			usuario.setSenha(novaSenhaCodificada);
+			usuario.setDataCadastro(LocalDateTime.now());
+			
+			usuarioRepository.save(usuario);
+			return true;
+		}
+		
+		return false;
 	}
 
 

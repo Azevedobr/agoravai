@@ -31,6 +31,12 @@ public class PedidoController {
     public List<Pedido> getPedidos() {
         return pedidoRepository.findAll();
     }
+    
+    // GET: /pedido/usuario/{userId}
+    @GetMapping("/usuario/{userId}")
+    public List<Pedido> getPedidosByUsuario(@PathVariable Long userId) {
+        return pedidoRepository.findByUsuario_IdOrderByDataPedidoDesc(userId);
+    }
 
     // GET: /pedido/create (para teste no navegador)
     @GetMapping("/create")

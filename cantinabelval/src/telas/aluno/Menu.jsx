@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './Menu.css';
 import { ProdutoService, CarrinhoService, UsuarioService, CategoriaService } from '../../services';
+import {
+  FiArrowLeft,
+  FiSearch,
+  FiShoppingCart,
+  FiHeart,
+  FiStar,
+  FiClock,
+  FiFilter,
+  FiPlus
+} from 'react-icons/fi';
 
-import AppHeader from '../../components/AppHeader';
-import SearchBar from '../../components/SearchBar';
 import CarrinhoModal from '../../components/CarrinhoModal';
 import DescricaoModal from '../../components/DescricaoModal';
 
@@ -143,97 +151,172 @@ const Menu = () => {
   });
 
   return (
-    <>
-    <AppHeader title="Nossas Delícias" subtitle="Escolha seus produtos favoritos" showBack={true} />
-    <div className="menu-container">
-      <SearchBar 
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Buscar produtos..."
-      />
-
-      <h1 className="menu-titulo">
-        <span className="destaque-titulo">Nossas Delícias</span>
-        <div className="linha-decorativa"></div>
-      </h1>
-
-      <div className="filtro-categorias">
-        {categorias.map(cat => (
-          <button
-            key={cat.id}
-            className={`btn-categoria ${categoriaSelecionada === cat.nome ? 'ativo' : ''}`}
-            onClick={() => setCategoriaSelecionada(cat.nome)}
-          >
-            {cat.nome}
-          </button>
-        ))}
-      </div>
-
-      <div className="menu-itens">
-        {produtosFiltrados.length === 0 && (
-          <div className="nenhum-produto">
-            <p>Nenhum produto encontrado.</p>
-            <p>Total de produtos: {produtos.length}</p>
+    <div className="menu-modern-container">
+      {/* Header Moderno */}
+      <header className="menu-header">
+        <div className="header-top">
+          <Link to="/telainicial" className="back-btn-modern">
+            <FiArrowLeft />
+          </Link>
+          <div className="header-title">
+            <h1>Menu Digital</h1>
+            <p>Escolha seus produtos favoritos</p>
           </div>
-        )}
+          <Link to="/carrinho" className="cart-btn">
+            <FiShoppingCart />
+            <span className="cart-badge">3</span>
+          </Link>
+        </div>
+        
+        <div className="search-section">
+          <div className="search-container">
+            <FiSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Buscar produtos deliciosos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+            <button className="filter-btn">
+              <FiFilter />
+            </button>
+          </div>
+        </div>
+      </header>
 
-        {produtosFiltrados.map((produto) => (
-          <div className="menu-item" key={produto.id}>
-            {produto.foto && (
-              <div className="imagem-container">
-                <img 
-                  src={`data:image/jpeg;base64,${produto.foto}`}
-                  alt={produto.nome} 
-                  className="menu-imagem"
-                  loading="lazy"
-                />
-                <div className="efeito-imagem"></div>
-              </div>
-            )}
-            <div className="conteudo-item">
-              <div className="categoria-badge">
-                {produto.categoria?.id === 4 ? 'SORVETES' :
-                 produto.categoria?.id === 1 ? 'SALGADOS' :
-                 produto.categoria?.id === 7 ? 'BOLACHAS' :
-                 produto.categoria?.id === 8 ? 'BEBIDAS' :
-                 produto.categoria?.nome}
-              </div>
-              <h2 className="menu-nome">{produto.nome}</h2>
-              <div className="detalhes-produto">
-                {produto.codigoBarras && <p className="menu-codigo">📊 {produto.codigoBarras}</p>}
-              </div>
-              <div className="menu-descricao">
-                <p>
-                  {truncateText(produto.descricao)}
-                </p>
-                {produto.descricao && produto.descricao.length > 80 && (
-                  <button 
-                    className="btn-ler-mais"
-                    onClick={() => toggleExpanded(produto)}
-                  >
-                    Ler mais
-                  </button>
-                )}
-              </div>
-              <div className="preco-container">
-                <p className="menu-preco">
-                  {Number(produto.preco).toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  })}
-                </p>
-              </div>
-              <button 
-                className="menu-botao"
-                onClick={() => handleAdicionar(produto)}
-              >
-                🛒 Adicionar
-                <span className="efeito-botao"></span>
-              </button>
+      <main className="menu-main">
+        {/* Hero Section */}
+        <section className="menu-hero">
+          <div className="hero-content">
+            <h2 className="hero-title">
+              <span className="title-line">Sabores que</span>
+              <span className="title-line gradient-text">conquistam</span>
+            </h2>
+            <p className="hero-description">
+              Produtos frescos e deliciosos preparados com carinho especialmente para você.
+            </p>
+          </div>
+          <div className="hero-stats">
+            <div className="stat-item">
+              <FiStar className="stat-icon" />
+              <span className="stat-number">4.9</span>
+              <span className="stat-label">Avaliação</span>
+            </div>
+            <div className="stat-item">
+              <FiClock className="stat-icon" />
+              <span className="stat-number">5min</span>
+              <span className="stat-label">Preparo</span>
             </div>
           </div>
-        ))}
-      </div>
+        </section>
+
+        {/* Categorias */}
+        <section className="categories-section">
+          <h3 className="section-title">Categorias</h3>
+          <div className="categories-grid">
+            {categorias.map(cat => (
+              <button
+                key={cat.id}
+                className={`category-card ${categoriaSelecionada === cat.nome ? 'active' : ''}`}
+                onClick={() => setCategoriaSelecionada(cat.nome)}
+              >
+                <div className="category-icon">
+                  {cat.nome === 'BEBIDAS' ? '🥤' :
+                   cat.nome === 'DOCES' ? '🍰' :
+                   cat.nome === 'SALGADOS' ? '🥪' :
+                   cat.nome === 'SORVETES' ? '🍦' :
+                   cat.nome === 'BOLACHAS' ? '🍪' : '🍴'}
+                </div>
+                <span className="category-name">{cat.nome}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Produtos */}
+        <section className="products-section">
+          <div className="section-header">
+            <h3 className="section-title">
+              {categoriaSelecionada === 'Todos' ? 'Todos os Produtos' : categoriaSelecionada}
+            </h3>
+            <span className="products-count">{produtosFiltrados.length} produtos</span>
+          </div>
+          
+          {produtosFiltrados.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🔍</div>
+              <h4>Nenhum produto encontrado</h4>
+              <p>Tente ajustar os filtros ou buscar por outro termo</p>
+            </div>
+          ) : (
+            <div className="products-grid">
+              {produtosFiltrados.map((produto) => (
+                <div className="product-card" key={produto.id}>
+                  <div className="card-header">
+                    {produto.foto ? (
+                      <div className="product-image">
+                        <img 
+                          src={`data:image/jpeg;base64,${produto.foto}`}
+                          alt={produto.nome} 
+                          loading="lazy"
+                        />
+                        <div className="image-overlay">
+                          <button className="favorite-btn">
+                            <FiHeart />
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                    <div className="category-tag">
+                      {produto.categoria?.id === 4 ? 'SORVETES' :
+                       produto.categoria?.id === 1 ? 'SALGADOS' :
+                       produto.categoria?.id === 7 ? 'BOLACHAS' :
+                       produto.categoria?.id === 8 ? 'BEBIDAS' :
+                       produto.categoria?.nome}
+                    </div>
+                  </div>
+                  
+                  <div className="card-content">
+                    <h4 className="product-name">{produto.nome}</h4>
+                    {produto.codigoBarras && (
+                      <p className="product-code">Código: {produto.codigoBarras}</p>
+                    )}
+                    <p className="product-description">
+                      {truncateText(produto.descricao, 60)}
+                      {produto.descricao && produto.descricao.length > 60 && (
+                        <button 
+                          className="read-more-btn"
+                          onClick={() => toggleExpanded(produto)}
+                        >
+                          ver mais
+                        </button>
+                      )}
+                    </p>
+                  </div>
+                  
+                  <div className="card-footer">
+                    <div className="price-section">
+                      <span className="price">
+                        {Number(produto.preco).toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        })}
+                      </span>
+                    </div>
+                    <button 
+                      className="add-to-cart-btn"
+                      onClick={() => handleAdicionar(produto)}
+                    >
+                      <FiPlus />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
       
       <CarrinhoModal 
         isOpen={modalAberto}
@@ -249,8 +332,6 @@ const Menu = () => {
         produto={produtoDescricao}
       />
     </div>
-
-    </>
   );
 };
 

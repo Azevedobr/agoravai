@@ -11,13 +11,20 @@ import {
   FiBell,
   FiHeart,
   FiZap,
-  FiShield
+  FiShield,
+  FiArrowRight,
+  FiPlay,
+  FiCheck,
+  FiGift,
+  FiCreditCard,
+  FiMapPin
 } from 'react-icons/fi';
 import './TelaInicial.css';
 
 const TelaInicial = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userName, setUserName] = useState('Usuário');
+  const [isVisible, setIsVisible] = useState(false);
   
   useEffect(() => {
     const usuario = UsuarioService.getCurrentUser();
@@ -25,6 +32,7 @@ const TelaInicial = () => {
       const primeiroNome = usuario.nome.split(' ')[0];
       setUserName(primeiroNome);
     }
+    setIsVisible(true);
   }, []);
   
   useEffect(() => {
@@ -40,224 +48,221 @@ const TelaInicial = () => {
   };
 
   return (
-    <div className="telainicio-container">
-      {/* Header Melhorado */}
+    <div className={`telainicio-container ${isVisible ? 'fade-in' : ''}`}>
+      {/* Header Moderno */}
       <header className="telainicio-header">
         <div className="telainicio-logo-container">
           <div className="logo-wrapper">
-            <span className="logo-icon">🍔</span>
-            <div>
+            <div className="logo-icon-modern">
+              <span className="logo-gradient">🍽️</span>
+            </div>
+            <div className="logo-text">
               <h1 className="telainicio-logo">FinnFood</h1>
-              <span className="telainicio-logo-subtitle">Sua Cantina Digital</span>
+              <span className="telainicio-logo-subtitle">Cantina Digital</span>
             </div>
           </div>
         </div>
+        
+        <nav className="telainicio-nav">
+          <Link to="/inicio" className="telainicio-nav-link active">
+            <FiStar className="nav-icon" />
+            <span>Início</span>
+          </Link>
+          <Link to="/menu" className="telainicio-nav-link">
+            <FiShoppingCart className="nav-icon" />
+            <span>Menu</span>
+          </Link>
+          <Link to="/carrinho" className="telainicio-nav-link">
+            <FiShoppingCart className="nav-icon" />
+            <span>Carrinho</span>
+          </Link>
+          <Link to="/paginaeditarperfil" className="telainicio-nav-link">
+            <FiUser className="nav-icon" />
+            <span>Perfil</span>
+          </Link>
+          <Link to="/pedidos" className="telainicio-nav-link">
+            <FiTrendingUp className="nav-icon" />
+            <span>Pedidos</span>
+          </Link>
+        </nav>
+        
         <div className="header-actions">
           <div className="time-display">
+            <FiClock className="time-icon" />
             {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
-        <nav className="telainicio-nav">
-          <Link to="/inicio" className="telainicio-nav-link active">
-            <FiStar /> Início
-          </Link>
-          <Link to="/menu" className="telainicio-nav-link">
-            <FiShoppingCart /> Menu
-          </Link>
-          <Link to="/carrinho" className="telainicio-nav-link">
-            <FiShoppingCart /> Carrinho
-          </Link>
-          <Link to="/paginaeditarperfil" className="telainicio-nav-link">
-            <FiUser /> Perfil
-          </Link>
-          <Link to="/pedidos" className="telainicio-nav-link">
-            <FiTrendingUp /> Pedidos
-          </Link>
-        </nav>
       </header>
 
       {/* Conteúdo principal */}
       <main className="telainicio-main">
-        {/* Welcome Section */}
-        <section className="welcome-section">
-          <div className="welcome-content">
-            <h2 className="welcome-greeting">{getGreeting()}, {userName}! 👋</h2>
-            <p className="welcome-subtitle">Que tal um lanche delicioso hoje?</p>
-          </div>
-          <div className="quick-stats">
-            <div className="stat-card">
-              <FiTrendingUp className="stat-icon" />
-              <div>
-                <span className="stat-number">47</span>
-                <span className="stat-label">Pedidos</span>
+        {/* Hero Section Moderna */}
+        <section className="hero-modern">
+          <div className="hero-content">
+            <div className="hero-badge">
+              <FiZap className="badge-icon" />
+              <span>Novo: Entrega em 3 minutos</span>
+            </div>
+            
+            <h1 className="hero-title">
+              <span className="title-line">Sua cantina</span>
+              <span className="title-line gradient-text">reimaginada</span>
+            </h1>
+            
+            <p className="hero-description">
+              Peça, pague e retire sem filas. A experiência mais rápida e segura 
+              para sua alimentação escolar.
+            </p>
+            
+            <div className="hero-actions">
+              <Link to="/menu" className="btn-primary">
+                <span>Fazer Pedido</span>
+                <FiArrowRight className="btn-arrow" />
+              </Link>
+              <Link to="/tutorial" className="btn-secondary">
+                <FiPlay className="play-icon" />
+                <span>Ver Como Funciona</span>
+              </Link>
+            </div>
+            
+            <div className="hero-stats">
+              <div className="stat-item">
+                <span className="stat-number">2.5k+</span>
+                <span className="stat-label">Pedidos hoje</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">4.9★</span>
+                <span className="stat-label">Avaliação</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">3min</span>
+                <span className="stat-label">Tempo médio</span>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Hero Section Melhorada */}
-        <section className="telainicio-hero-section">
-          <div className="telainicio-hero-content">
-            <div className="telainicio-hero-badge">
-              <FiZap className="telainicio-badge-icon" />
-              <span>Entrega em 5 minutos</span>
-            </div>
-            <h1 className="telainicio-hero-title">
-              <span className="telainicio-title-highlight">Sabor</span> e
-              <span className="telainicio-title-gradient"> praticidade</span>
-              <br />em suas mãos
-            </h1>
-            <p className="telainicio-hero-description">
-              🚀 Peça em segundos, pague com segurança e retire sem esperar!
-              <br />Sua cantina favorita agora é 100% digital.
-            </p>
-            <div className="telainicio-hero-buttons">
-              <Link to="/menu" className="telainicio-cta-primary">
-                <FiShoppingCart className="telainicio-btn-icon" />
-                Explorar Menu
-                <span className="telainicio-btn-shine"></span>
-              </Link>
-              <Link to="/pedidos" className="telainicio-cta-secondary">
-                <FiTrendingUp className="telainicio-btn-icon" />
-                Ver Pedidos
-              </Link>
-            </div>
-          </div>
-          <div className="telainicio-hero-visual">
-            <div className="telainicio-floating-card telainicio-card-1">
-              <FiZap className="telainicio-card-icon" />
-              <span>Entrega Rápida</span>
-            </div>
-            <div className="telainicio-floating-card telainicio-card-2">
-              <FiShield className="telainicio-card-icon" />
-              <span>100% Seguro</span>
-            </div>
-            <div className="telainicio-floating-card telainicio-card-3">
-              <FiHeart className="telainicio-card-icon" />
-              <span>Seus Favoritos</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Seção de recursos */}
-        <section className="features-section">
-          <div className="section-header">
-            <h2 className="section-title">
-              <span className="title-decoration">✨</span>
-              Por que escolher FinnFood?
-              <span className="title-decoration">✨</span>
-            </h2>
-            <div className="title-underline"></div>
           </div>
           
-          <div className="features-grid">
-            <FeatureCard
-              icon={<FiClock className="feature-icon" />}
-              title="⚡ Pedidos Ultra-Rápidos"
-              description="Faça seu pedido em menos de 30 segundos! Escolha horário de retirada e evite qualquer fila na cantina"
-              color="#ff6b6b"
+          <div className="hero-visual">
+            <div className="phone-mockup">
+              <div className="phone-screen">
+                <div className="app-preview">
+                  <div className="app-header">
+                    <div className="app-title">Menu do Dia</div>
+                    <div className="app-time">12:30</div>
+                  </div>
+                  <div className="food-grid">
+                    <div className="food-item">🍕</div>
+                    <div className="food-item">🍔</div>
+                    <div className="food-item">🥤</div>
+                    <div className="food-item">🍰</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="floating-elements">
+              <div className="floating-card card-1">
+                <FiCheck className="card-icon success" />
+                <span>Pedido confirmado!</span>
+              </div>
+              <div className="floating-card card-2">
+                <FiCreditCard className="card-icon" />
+                <span>Pagamento seguro</span>
+              </div>
+              <div className="floating-card card-3">
+                <FiMapPin className="card-icon" />
+                <span>Pronto para retirar</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Welcome Personal */}
+        <section className="welcome-personal">
+          <div className="welcome-card">
+            <div className="welcome-text">
+              <h2 className="welcome-greeting">{getGreeting()}, {userName}! 👋</h2>
+              <p className="welcome-subtitle">Pronto para um lanche delicioso?</p>
+            </div>
+            <div className="welcome-actions">
+              <Link to="/menu" className="quick-order-btn">
+                <FiShoppingCart className="quick-icon" />
+                <span>Pedido Rápido</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Modernas */}
+        <section className="features-modern">
+          <div className="features-header">
+            <h2 className="features-title">Tudo que você precisa</h2>
+            <p className="features-subtitle">Uma experiência completa e sem complicações</p>
+          </div>
+          
+          <div className="features-grid-modern">
+            <FeatureCardModern
+              icon={<FiZap />}
+              title="Pedidos Instantâneos"
+              description="Faça seu pedido em segundos com nossa interface otimizada"
+              gradient="from-orange-400 to-pink-400"
             />
-            <FeatureCard
-              icon={<FiShoppingCart className="feature-icon" />}
-              title="🛡️ Pagamento 100% Seguro"
-              description="PIX instantâneo, cartão ou dinheiro. Criptografia bancária e proteção total dos seus dados pessoais"
-              color="#4ecdc4"
+            <FeatureCardModern
+              icon={<FiShield />}
+              title="Pagamento Seguro"
+              description="PIX, cartão ou dinheiro com criptografia de nível bancário"
+              gradient="from-green-400 to-blue-400"
             />
-            <FeatureCard
-              icon={<FiUser className="feature-icon" />}
-              title="🎯 Experiência Personalizada"
-              description="IA que aprende suas preferências, histórico completo de pedidos e recomendações personalizadas"
-              color="#45b7d1"
+            <FeatureCardModern
+              icon={<FiStar />}
+              title="Experiência Premium"
+              description="Interface intuitiva e recomendações personalizadas"
+              gradient="from-purple-400 to-pink-400"
             />
-            <FeatureCard
-              icon={<FiSmartphone className="feature-icon" />}
-              title="📱 Acesso Total Mobile"
-              description="App otimizado para celular, notificações em tempo real e funciona offline para emergências"
-              color="#f9ca24"
+            <FeatureCardModern
+              icon={<FiSmartphone />}
+              title="Mobile First"
+              description="Otimizado para celular com notificações em tempo real"
+              gradient="from-blue-400 to-cyan-400"
             />
           </div>
         </section>
 
-        {/* Seção de Ações Rápidas */}
-        <section className="quick-actions-section">
-          <h3 className="section-subtitle">Ações Rápidas</h3>
-          <div className="quick-actions-grid">
-            <Link to="/menu" className="action-card">
-              <FiShoppingCart className="action-icon" />
-              <span>Fazer Pedido</span>
-            </Link>
-            <Link to="/pedidos" className="action-card">
-              <FiTrendingUp className="action-icon" />
-              <span>Meus Pedidos</span>
-            </Link>
-            <Link to="/paginaeditarperfil" className="action-card">
-              <FiUser className="action-icon" />
-              <span>Meu Perfil</span>
-            </Link>
-            <Link to="/carrinho" className="action-card">
-              <FiShoppingCart className="action-icon" />
-              <span>Carrinho</span>
-            </Link>
+        {/* Promoção Especial */}
+        <section className="promo-section">
+          <div className="promo-card">
+            <div className="promo-icon">
+              <FiGift className="gift-icon" />
+            </div>
+            <div className="promo-content">
+              <h3 className="promo-title">Oferta Especial de Lançamento!</h3>
+              <p className="promo-description">
+                Todos os planos GRATUITOS por 1 ano completo. 
+                Aproveite e modernize sua experiência na cantina.
+              </p>
+              <Link to="/menu" className="promo-btn">
+                <span>Aproveitar Oferta</span>
+                <FiArrowRight className="promo-arrow" />
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* Seção de estatísticas melhorada */}
-        <section className="telainicio-stats-section">
-          <h3 className="section-subtitle">Nossa Comunidade</h3>
-          <div className="telainicio-stats-grid">
-            <div className="telainicio-stat-item">
-              <div className="stat-icon-wrapper">
-                <FiTrendingUp className="stat-icon-large" />
-              </div>
-              <div className="telainicio-stat-number">2.5K+</div>
-              <div className="telainicio-stat-label">Pedidos Este Mês</div>
-            </div>
-            <div className="telainicio-stat-item">
-              <div className="stat-icon-wrapper">
-                <FiStar className="stat-icon-large" />
-              </div>
-              <div className="telainicio-stat-number">4.9★</div>
-              <div className="telainicio-stat-label">Avaliação Média</div>
-            </div>
-            <div className="telainicio-stat-item">
-              <div className="stat-icon-wrapper">
-                <FiClock className="stat-icon-large" />
-              </div>
-              <div className="telainicio-stat-number">3min</div>
-              <div className="telainicio-stat-label">Tempo Médio</div>
-            </div>
-            <div className="telainicio-stat-item">
-              <div className="stat-icon-wrapper">
-                <FiUser className="stat-icon-large" />
-              </div>
-              <div className="telainicio-stat-number">850+</div>
-              <div className="telainicio-stat-label">Estudantes Ativos</div>
-            </div>
-          </div>
-        </section>
+
       </main>
     </div>
   );
 };
 
-// Componente reutilizável para os cards melhorado
-const FeatureCard = ({ icon, title, description, color }) => (
-  <div className="feature-card" style={{ '--card-color': color }}>
-    <div className="card-header">
-      <div className="icon-container">
-        {icon}
-        <div className="icon-glow"></div>
-      </div>
+// Componente moderno para features
+const FeatureCardModern = ({ icon, title, description, gradient }) => (
+  <div className="feature-card-modern">
+    <div className={`feature-icon-modern bg-gradient-to-r ${gradient}`}>
+      {icon}
     </div>
-    <div className="card-content">
-      <h3 className="card-title">{title}</h3>
-      <p className="card-description">{description}</p>
-    </div>
-    <div className="card-footer">
-      <div className="card-stats">
-        <span className="card-metric">98% satisfação</span>
-      </div>
-      <span className="learn-more">Experimentar →</span>
+    <h3 className="feature-title-modern">{title}</h3>
+    <p className="feature-description-modern">{description}</p>
+    <div className="feature-arrow">
+      <FiArrowRight />
     </div>
   </div>
 );

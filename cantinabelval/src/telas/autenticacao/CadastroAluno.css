@@ -1,34 +1,21 @@
-:root {
-  --primary-color: #6C63FF;
-  --secondary-color: #FFE44C;
-  --accent-color: #8B7EFF;
-  --dark-bg: #0A0E27;
-  --surface-color: #1A1F3A;
-  --card-color: #252B4A;
-  --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --gradient-bg: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2D1B69 100%);
-  --gradient-primary: linear-gradient(135deg, #6C63FF, #8B7EFF);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-
+/* Container principal - design moderno */
 .food-app-container {
   min-height: 100vh;
-  background: var(--gradient-bg);
-  position: relative;
-  overflow: hidden;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
+    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #ffffff;
+  overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 2rem;
 }
 
+/* Background animado */
 .food-background {
   position: absolute;
   top: 0;
@@ -36,14 +23,16 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+  overflow: hidden;
 }
 
 .food-bubbles {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 20% 80%, rgba(108, 99, 255, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(139, 126, 255, 0.1) 0%, transparent 50%);
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(247, 147, 30, 0.1) 0%, transparent 50%);
 }
 
 .food-stripes {
@@ -59,186 +48,255 @@
   );
 }
 
+/* Card principal */
 .food-main-card {
-  background: var(--card-color);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem;
   width: 100%;
-  max-width: 450px;
+  max-width: 480px;
   z-index: 10;
   position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.8s ease-out;
 }
 
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header da marca */
 .food-brand-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 2rem;
 }
 
 .food-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 10px;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .food-icon {
-  font-size: 2.5rem;
-  background: var(--gradient-primary);
-  padding: 15px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
 }
 
 .food-logo h1 {
-  color: var(--text-primary);
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .food-brand-header p {
-  color: var(--text-secondary);
-  font-size: 1rem;
-  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Formulário */
+.food-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .food-login-form h2 {
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 1rem 0;
   text-align: center;
-  margin-bottom: 25px;
 }
 
+/* Grupos de input */
 .food-input-group {
-  margin-bottom: 20px;
   position: relative;
+  margin-bottom: 1rem;
 }
 
 .food-input-group input {
   width: 100%;
-  padding: 16px 20px;
-  background: var(--surface-color);
-  border: 2px solid transparent;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  color: var(--text-primary);
+  color: white;
   font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
   transition: all 0.3s ease;
+  outline: none;
+  font-family: 'Inter', sans-serif;
 }
 
+.food-input-group input:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.food-input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Toggle de senha */
 .food-password-toggle {
   position: absolute;
-  right: 15px;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  padding: 5px;
-  transition: color 0.3s ease;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  z-index: 1;
 }
 
 .food-password-toggle:hover {
-  color: var(--primary-color);
+  color: white;
 }
 
-.food-input-group input::placeholder {
-  color: var(--text-secondary);
-}
-
-.food-input-group input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.2);
-}
-
+/* Opções */
 .food-options {
-  margin-bottom: 25px;
+  margin: 1rem 0;
 }
 
 .food-check {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+  align-items: flex-start;
+  gap: 0.75rem;
   cursor: pointer;
+  line-height: 1.5;
 }
 
 .food-check input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: var(--primary-color);
+  accent-color: #ff6b35;
+  margin: 0;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.food-btn-primary {
-  width: 100%;
-  padding: 16px;
-  background: var(--gradient-primary);
-  border: none;
-  border-radius: 12px;
-  color: var(--text-primary);
-  font-size: 1.1rem;
-  font-weight: 600;
-  font-family: 'Poppins', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
+.food-check span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
 }
 
-.food-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(108, 99, 255, 0.4);
-}
-
-.btn-icon {
-  font-size: 1.2rem;
-}
-
-.food-footer {
-  text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.food-footer p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-}
-
+/* Links */
 .food-link {
-  color: var(--primary-color);
+  color: #ff6b35;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .food-link:hover {
-  color: var(--accent-color);
+  color: #f7931e;
 }
 
+/* Botão principal */
+.food-btn-primary {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.food-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Footer */
+.food-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.food-footer p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
+  .food-app-container {
+    padding: 1rem;
+  }
+  
   .food-main-card {
-    padding: 30px 20px;
-    margin: 10px;
+    padding: 1.5rem;
   }
   
   .food-logo h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
   
-  .food-icon {
-    font-size: 2rem;
-    padding: 12px;
+  .food-login-form h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .food-main-card {
+    padding: 1rem;
+  }
+  
+  .food-logo {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .food-logo h1 {
+    font-size: 1.3rem;
+  }
+  
+  .food-input-group input {
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .food-password-toggle {
+    right: 0.875rem;
   }
 }

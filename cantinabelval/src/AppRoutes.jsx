@@ -3,6 +3,7 @@ import App from "./App";
 import { CadastroAluno, Login, EsqueceuSenha } from "./telas/autenticacao";
 import Termos from "./telas/autenticacao/Termos";
 import { TelaInicial, Dashboard, PaginaInicial, Pedidos } from "./telas/inicio";
+import Tutorial from "./telas/inicio/Tutorial";
 import { Carrinho, EditarPerfil as EditarPerfilAluno, PagamentoCartao, Menu } from "./telas/aluno";
 import { Funcionarios, Historico, CadastrarProduto, EditarPerfil as EditarPerfilEscola } from "./telas/escola";
 import GerenciarProdutos from "./telas/escola/GerenciarProdutos";
@@ -32,6 +33,7 @@ const AppRoutes = () => {
       <Route path="/gerenciar-produtos" element={<GerenciarProdutos />} />
       <Route path="/editarperfil" element={<EditarPerfilEscola />} />
       <Route path="/central-ajuda" element={<CentralAjuda />} />
+      <Route path="/tutorial" element={<Tutorial />} />
       <Route path="/termos" element={<Termos />} />
 
 

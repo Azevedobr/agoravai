@@ -5,6 +5,7 @@ import Termos from "./telas/autenticacao/Termos";
 import { TelaInicial, Dashboard, PaginaInicial, Pedidos } from "./telas/inicio";
 import { Carrinho, EditarPerfil as EditarPerfilAluno, PagamentoCartao, Menu } from "./telas/aluno";
 import { Funcionarios, Historico, CadastrarProduto, EditarPerfil as EditarPerfilEscola } from "./telas/escola";
+import GerenciarProdutos from "./telas/escola/GerenciarProdutos";
 import CentralAjuda from "./components/CentralAjuda";
 
 
@@ -28,6 +29,7 @@ const AppRoutes = () => {
       <Route path="/pedidos" element={<Pedidos />} />
       <Route path="/esqueceu" element={<EsqueceuSenha />} />
       <Route path="/cadastrar-produto" element={<CadastrarProduto />} />
+      <Route path="/gerenciar-produtos" element={<GerenciarProdutos />} />
       <Route path="/editarperfil" element={<EditarPerfilEscola />} />
       <Route path="/central-ajuda" element={<CentralAjuda />} />
       <Route path="/termos" element={<Termos />} />

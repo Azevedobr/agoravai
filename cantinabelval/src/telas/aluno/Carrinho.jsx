@@ -13,45 +13,66 @@ const Carrinho = () => {
   const [pagamento, setPagamento] = useState('');
 
   useEffect(() => {
-    if (location.state?.novoItem) {
-      adicionarItem(location.state.novoItem);
+    carregarCarrinho();
+  }, []);
+
+  const carregarCarrinho = async () => {
+    const usuario = UsuarioService.getCurrentUser();
+    if (!usuario) return;
+
+    try {
+      // Carregar do carrinho temporário
+      const carrinhoKey = `carrinho_${usuario.id}`;
+      const carrinhoData = sessionStorage.getItem(carrinhoKey);
+      
+      if (carrinhoData) {
+        const itens = JSON.parse(carrinhoData);
+        setItems(itens);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar carrinho:', error);
     }
-  }, [location.state]);
+  };
 
   useEffect(() => {
     const subtotal = items.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
     setTotal(subtotal);
   }, [items]);
 
-  const adicionarItem = (novoItem) => {
-    setItems((prevItems) => {
-      const itemExistente = prevItems.find(item => item.nome === novoItem.nome);
-      if (itemExistente) {
-        return prevItems.map(item =>
-          item.nome === novoItem.nome
-            ? { ...item, quantidade: item.quantidade + 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, novoItem];
-      }
-    });
-  };
+
 
   const handleIncrementar = (id) => {
-    setItems(items.map(item => item.id === id ? { ...item, quantidade: item.quantidade + 1 } : item));
+    const usuario = UsuarioService.getCurrentUser();
+    const novosItens = items.map(item => item.id === id ? { ...item, quantidade: item.quantidade + 1 } : item);
+    setItems(novosItens);
+    
+    // Atualizar sessionStorage
+    const carrinhoKey = `carrinho_${usuario.id}`;
+    sessionStorage.setItem(carrinhoKey, JSON.stringify(novosItens));
   };
 
   const handleDecrementar = (id) => {
-    setItems(items.map(item =>
+    const usuario = UsuarioService.getCurrentUser();
+    const novosItens = items.map(item =>
       item.id === id && item.quantidade > 1
         ? { ...item, quantidade: item.quantidade - 1 }
         : item
-    ));
+    );
+    setItems(novosItens);
+    
+    // Atualizar sessionStorage
+    const carrinhoKey = `carrinho_${usuario.id}`;
+    sessionStorage.setItem(carrinhoKey, JSON.stringify(novosItens));
   };
 
   const handleRemover = (id) => {
-    setItems(items.filter(item => item.id !== id));
+    const usuario = UsuarioService.getCurrentUser();
+    const novosItens = items.filter(item => item.id !== id);
+    setItems(novosItens);
+    
+    // Atualizar sessionStorage
+    const carrinhoKey = `carrinho_${usuario.id}`;
+    sessionStorage.setItem(carrinhoKey, JSON.stringify(novosItens));
   };
 
   const handlePagamentoChange = (opcao) => {
@@ -98,6 +119,10 @@ const Carrinho = () => {
       console.log('Response body:', responseText);
       
       if (response.ok) {
+        // Limpar carrinho temporário
+        const carrinhoKey = `carrinho_${usuario.id}`;
+        sessionStorage.removeItem(carrinhoKey);
+        
         alert('Pedido realizado com sucesso!');
         setItems([]);
         navigate('/pedidos');

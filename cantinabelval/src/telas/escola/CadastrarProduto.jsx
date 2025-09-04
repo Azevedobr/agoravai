@@ -26,6 +26,8 @@ const CadastrarProduto = () => {
     carregarProdutos();
   }, []);
 
+
+
   const carregarProdutos = async () => {
     try {
       const response = await fetch('http://localhost:8080/produto/findAll');
@@ -259,6 +261,8 @@ const CadastrarProduto = () => {
                   required
                 />
               </div>
+              
+
 
               <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? 'Cadastrando...' : 'Adicionar Produto'}

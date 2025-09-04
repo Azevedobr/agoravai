@@ -5,6 +5,8 @@ import { ProdutoService, CarrinhoService, UsuarioService, CategoriaService } fro
 
 import AppHeader from '../../components/AppHeader';
 import SearchBar from '../../components/SearchBar';
+import CarrinhoModal from '../../components/CarrinhoModal';
+import DescricaoModal from '../../components/DescricaoModal';
 
 const Menu = () => {
   const navigate = useNavigate();
@@ -13,6 +15,10 @@ const Menu = () => {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedItems, setExpandedItems] = useState({});
+  const [modalAberto, setModalAberto] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [descricaoModalAberto, setDescricaoModalAberto] = useState(false);
+  const [produtoDescricao, setProdutoDescricao] = useState(null);
 
   useEffect(() => {
     carregarDados();
@@ -67,36 +73,55 @@ const Menu = () => {
   const handleAdicionar = async (produto) => {
     const usuario = UsuarioService.getCurrentUser();
     
-    const produtoFormatado = {
-      id: Date.now(),
-      nome: produto.nome,
-      preco: Number(produto.preco),
-      quantidade: 1,
-      peso: produto.peso,
-      volume: produto.volume,
-      imagem: produto.imagem,
-    };
-
-    if (usuario) {
-      try {
-        await CarrinhoService.adicionarItem({
-          produtoId: produto.id,
-          quantidade: 1,
-          usuarioId: usuario.id
-        });
-      } catch (error) {
-        console.error('Erro ao adicionar ao carrinho:', error);
-      }
+    if (!usuario) {
+      alert('Você precisa estar logado!');
+      navigate('/entraraluno');
+      return;
     }
-    
-    navigate('/carrinho', { state: { novoItem: produtoFormatado } });
+
+    try {
+      // Salvar no carrinho temporário (usando usuário como chave)
+      const carrinhoKey = `carrinho_${usuario.id}`;
+      const carrinhoAtual = JSON.parse(sessionStorage.getItem(carrinhoKey) || '[]');
+      
+      const itemExistente = carrinhoAtual.find(item => item.produtoId === produto.id);
+      
+      if (itemExistente) {
+        itemExistente.quantidade += 1;
+      } else {
+        carrinhoAtual.push({
+          id: Date.now(),
+          produtoId: produto.id,
+          nome: produto.nome,
+          preco: parseFloat(produto.preco),
+          quantidade: 1
+        });
+      }
+      
+      sessionStorage.setItem(carrinhoKey, JSON.stringify(carrinhoAtual));
+      
+      // Mostrar modal
+      setProdutoSelecionado(produto);
+      setModalAberto(true);
+    } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      alert('Erro ao adicionar produto ao carrinho');
+    }
   };
 
-  const toggleExpanded = (produtoId) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [produtoId]: !prev[produtoId]
-    }));
+  const handleIrCarrinho = () => {
+    setModalAberto(false);
+    navigate('/carrinho');
+  };
+
+  const handleContinuarComprando = () => {
+    setModalAberto(false);
+    setProdutoSelecionado(null);
+  };
+
+  const toggleExpanded = (produto) => {
+    setProdutoDescricao(produto);
+    setDescricaoModalAberto(true);
   };
 
   const truncateText = (text, maxLength = 80) => {
@@ -179,17 +204,14 @@ const Menu = () => {
               </div>
               <div className="menu-descricao">
                 <p>
-                  {expandedItems[produto.id] 
-                    ? produto.descricao 
-                    : truncateText(produto.descricao)
-                  }
+                  {truncateText(produto.descricao)}
                 </p>
                 {produto.descricao && produto.descricao.length > 80 && (
                   <button 
                     className="btn-ler-mais"
-                    onClick={() => toggleExpanded(produto.id)}
+                    onClick={() => toggleExpanded(produto)}
                   >
-                    {expandedItems[produto.id] ? 'Ler menos' : 'Ler mais'}
+                    Ler mais
                   </button>
                 )}
               </div>
@@ -212,6 +234,20 @@ const Menu = () => {
           </div>
         ))}
       </div>
+      
+      <CarrinhoModal 
+        isOpen={modalAberto}
+        onClose={handleContinuarComprando}
+        produto={produtoSelecionado}
+        onIrCarrinho={handleIrCarrinho}
+        onContinuarComprando={handleContinuarComprando}
+      />
+      
+      <DescricaoModal 
+        isOpen={descricaoModalAberto}
+        onClose={() => setDescricaoModalAberto(false)}
+        produto={produtoDescricao}
+      />
     </div>
 
     </>
